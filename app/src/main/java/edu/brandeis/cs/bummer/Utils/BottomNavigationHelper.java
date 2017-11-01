@@ -11,7 +11,7 @@ import android.view.MenuItem;
 import com.ittianyu.bottomnavigationviewex.BottomNavigationViewEx;
 
 import edu.brandeis.cs.bummer.MainActivity;
-import edu.brandeis.cs.bummer.PostActivity.PostActivity;
+import edu.brandeis.cs.bummer.Post.PostActivity;
 import edu.brandeis.cs.bummer.Profile.ProfileActivity;
 import edu.brandeis.cs.bummer.R;
 
@@ -23,6 +23,9 @@ public class BottomNavigationHelper {
     private static final String TAG = "BottomNavigationHelper";
     public static void setupBottomNavigation(BottomNavigationViewEx ex) {
         Log.d(TAG, "setupBottomNavigation: ");
+
+
+
         ex.enableAnimation(false);
         ex.enableItemShiftingMode(false);
         ex.enableShiftingMode(false);

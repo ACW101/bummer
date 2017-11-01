@@ -29,5 +29,5 @@ dependencies {
     testCompile 'junit:junit:4.12'
     compile "com.android.support:support-core-utils:27.0.0"
     compile 'com.android.support:design:27.0.0'
-    compile 'com.github.ittianyu:BottomNavigationViewEx:1.1.9'
+    compile 'com.github.ittianyu:BottomNavigationViewEx:1.2.3'
 }
