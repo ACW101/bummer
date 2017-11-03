@@ -1,3 +1,5 @@
 <resources>
     <string name="app_name">Bummer</string>
+    <string name="title_activity_maps">Map</string>
+    <string name="sign_in">Sign in</string>
 </resources>
