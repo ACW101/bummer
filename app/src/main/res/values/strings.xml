@@ -28,7 +28,7 @@
     <string name="hint_user_id">User ID</string>
     <string name="get_custom_token">Get Token</string>
     <string name="sign_in">Sign In</string>
-    <string name="create_account">Create Account</string>
+
     <string name="sign_out">Sign Out</string>
     <string name="verify_email">Verify Email</string>
     <string name="disconnect">Disconnect</string>
@@ -74,4 +74,7 @@
 
     <string name="id_fmt">User ID: %s</string>
     <string name="email_fmt">Email: %s</string>
+    <string name="sign_up_ul"><u>Sign up</u></string>
+    <string name="sign_in_ul"><u>Sign in</u></string>
+    <string name="sign_up">Sign up</string>
 </resources>

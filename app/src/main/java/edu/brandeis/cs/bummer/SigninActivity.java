@@ -20,6 +20,7 @@ public class SigninActivity extends BaseActivity implements
         View.OnClickListener {
 
     private static final String TAG = "EmailPassword";
+    private static final int SIGN_UP = 8;
 
     private EditText mEmailField;
     private EditText mPasswordField;
@@ -36,7 +37,7 @@ public class SigninActivity extends BaseActivity implements
 
         // Buttons
         findViewById(R.id.email_sign_in_button).setOnClickListener(this);
-        findViewById(R.id.email_create_account_button).setOnClickListener(this);
+        findViewById(R.id.sign_up_textview).setOnClickListener(this);
 
         // Views
         mEmailField = findViewById(R.id.field_email);
@@ -144,8 +145,8 @@ public class SigninActivity extends BaseActivity implements
         int i = v.getId();
         if (i == R.id.email_sign_in_button) {
             signIn(mEmailField.getText().toString(), mPasswordField.getText().toString());
-        } else if (i == R.id.email_create_account_button) {
-            startActivity(new Intent(SigninActivity.this, SignupActivity.class));
+        } else if (i == R.id.sign_up_textview) {
+            startActivityForResult(new Intent(SigninActivity.this, SignupActivity.class), SIGN_UP);
         }
     }
 }

@@ -33,8 +33,8 @@ public class SignupActivity extends BaseActivity implements View.OnClickListener
         setContentView(R.layout.activity_signup);
 
         // Buttons
-        findViewById(R.id.email_sign_in_button).setOnClickListener(this);
-        findViewById(R.id.email_create_account_button).setOnClickListener(this);
+        findViewById(R.id.email_sign_up_button).setOnClickListener(this);
+        findViewById(R.id.sign_in_textview).setOnClickListener(this);
 
         // Views
         mEmailField = findViewById(R.id.field_email);
@@ -105,10 +105,12 @@ public class SignupActivity extends BaseActivity implements View.OnClickListener
     @Override
     public void onClick(View view) {
         int i = view.getId();
-        if (i == R.id.email_create_account_button) {
+        if (i == R.id.email_sign_up_button) {
             createAccount(mEmailField.getText().toString(), mPasswordField.getText().toString());
-        } else if (i == R.id.email_sign_in_button) {
-            startActivity(new Intent(SignupActivity.this, SigninActivity.class));
+        } else if (i == R.id.sign_in_textview) {
+            Intent returnIntent = new Intent();
+            setResult(Activity.RESULT_CANCELED, returnIntent);
+            finish();
         }
     }
 }
