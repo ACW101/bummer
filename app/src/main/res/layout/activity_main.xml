@@ -1,18 +1,26 @@
 <?xml version="1.0" encoding="utf-8"?>
-<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
+<android.support.design.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
+xmlns:app="http://schemas.android.com/apk/res-auto"
+xmlns:tools="http://schemas.android.com/tools"
+android:layout_width="match_parent"
+android:layout_height="match_parent"
+tools:context=".MainActivity">
+
+<RelativeLayout
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="edu.brandeis.cs.bummer.MainActivity">
+    android:id="@+id/relLayoutParent">
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:id="@+id/relLayout2"
+        >
 
-    <Button
-        android:id="@+id/sign_out_button"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_weight="1.0"
-        android:text="@string/sign_out"
-        android:theme="@style/ThemeOverlay.MyDarkButton" />
+        <include layout="@layout/imageview"/>
 
 
-</android.support.constraint.ConstraintLayout>
+    </RelativeLayout>
+    <include layout="@layout/bottom_navi_bar"/>
+
+</RelativeLayout>
+</android.support.design.widget.CoordinatorLayout>

@@ -28,6 +28,8 @@
             android:name=".SignupActivity"
             android:windowSoftInputMode="adjustResize">
         </activity>
+        <activity android:name=".Post.PostActivity"/>
+        <activity android:name=".Profile.ProfileActivity"/>
     </application>
 
 </manifest>

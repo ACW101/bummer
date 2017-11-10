@@ -1,8 +1,18 @@
 package edu.brandeis.cs.bummer;
 
+import android.content.Context;
+import android.support.v7.app.AppCompatActivity;
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
+import android.view.Menu;
+import android.view.MenuItem;
+import android.widget.ImageView;
+
+import com.ittianyu.bottomnavigationviewex.BottomNavigationViewEx;
+
+import edu.brandeis.cs.bummer.Utils.BottomNavigationHelper;
 import android.util.Log;
 import android.view.View;
 import android.widget.Toast;
@@ -13,6 +23,9 @@ import com.google.firebase.auth.FirebaseUser;
 public class MainActivity extends BaseActivity implements View.OnClickListener {
     private static final String TAG = "MainActivity";
     private static final int SIGN_IN = 7;
+    private static final int ACTIVITY_NUM = 0;
+
+    private Context mContext = MainActivity.this;
     private FirebaseUser currentUser;
 
     // [START declare_auth]
@@ -21,12 +34,16 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        Log.d(TAG, "onCreate: ");
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         mAuth = FirebaseAuth.getInstance();
 
         // Buttons
         findViewById(R.id.sign_out_button).setOnClickListener(this);
+        ImageView imageView = findViewById(R.id.ImageView);
+        imageView.setImageResource(R.drawable.jp_monkey);
+        setupBottomNavigationView();
     }
 
     @Override
@@ -71,4 +88,15 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
             }
         }
     }
+    private void setupBottomNavigationView(){
+
+        BottomNavigationViewEx bottomNavigationViewEx = (BottomNavigationViewEx) findViewById(R.id.bottomNavViewBar);
+
+        BottomNavigationHelper.setupBottomNavigation(bottomNavigationViewEx);
+        BottomNavigationHelper.enableNavigation(mContext, this, bottomNavigationViewEx);
+        Menu menu = bottomNavigationViewEx.getMenu();
+        MenuItem menuItem = menu.getItem(ACTIVITY_NUM);
+        menuItem.setChecked(true);
+    }
+
 }
