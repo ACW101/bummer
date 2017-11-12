@@ -44,6 +44,7 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
         ImageView imageView = findViewById(R.id.ImageView);
         imageView.setImageResource(R.drawable.jp_monkey);
         setupBottomNavigationView();
+        mAuth.signOut();
     }
 
     @Override
@@ -53,17 +54,11 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
         if (currentUser != null) {
             Log.d(TAG, "current user = " + currentUser.getUid());
         } else {
-            signIn();
+            Log.d(TAG, "user not logged in, navigating to sign in page");
+            Intent intent = new Intent(this, SigninActivity.class);
+            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+            startActivity(intent);
         }
-    }
-
-    private void signIn() {
-        startActivityForResult(new Intent(this, SigninActivity.class), SIGN_IN);
-    }
-
-    private void signOut() {
-        mAuth.signOut();
-        signIn();
     }
 
     @Override
@@ -71,20 +66,6 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
         int i = v.getId();
     }
 
-//    @Override
-//    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-//        super.onActivityResult(requestCode, resultCode, data);
-//
-//        if(requestCode == SIGN_IN) {
-//            if (resultCode == Activity.RESULT_OK) {
-//                Log.d(TAG, "in ok");
-//                Toast.makeText(this, "ok", Toast.LENGTH_SHORT).show();
-//            }
-//            if (resultCode == Activity.RESULT_CANCELED){
-//                Toast.makeText(this, "canceled", Toast.LENGTH_SHORT).show();
-//            }
-//        }
-//    }
     private void setupBottomNavigationView(){
 
         BottomNavigationViewEx bottomNavigationViewEx = (BottomNavigationViewEx) findViewById(R.id.bottomNavViewBar);
