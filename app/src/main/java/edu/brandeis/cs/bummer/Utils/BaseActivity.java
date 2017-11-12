@@ -1,8 +1,10 @@
-package edu.brandeis.cs.bummer;
+package edu.brandeis.cs.bummer.Utils;
 
 import android.app.ProgressDialog;
 import android.support.annotation.VisibleForTesting;
 import android.support.v7.app.AppCompatActivity;
+
+import edu.brandeis.cs.bummer.R;
 
 public class BaseActivity extends AppCompatActivity {
 

@@ -1,7 +1,6 @@
 package edu.brandeis.cs.bummer;
 
 import android.content.Context;
-import android.support.v7.app.AppCompatActivity;
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
@@ -12,8 +11,10 @@ import android.widget.ImageView;
 
 import com.ittianyu.bottomnavigationviewex.BottomNavigationViewEx;
 
+import edu.brandeis.cs.bummer.Auth.SigninActivity;
+import edu.brandeis.cs.bummer.Utils.BaseActivity;
 import edu.brandeis.cs.bummer.Utils.BottomNavigationHelper;
-import android.util.Log;
+
 import android.view.View;
 import android.widget.Toast;
 
@@ -40,7 +41,6 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
         mAuth = FirebaseAuth.getInstance();
 
         // Buttons
-        findViewById(R.id.sign_out_button).setOnClickListener(this);
         ImageView imageView = findViewById(R.id.ImageView);
         imageView.setImageResource(R.drawable.jp_monkey);
         setupBottomNavigationView();
@@ -69,25 +69,22 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
     @Override
     public void onClick(View v) {
         int i = v.getId();
-        if (i == R.id.sign_out_button) {
-            signOut();
-        }
     }
 
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-
-        if(requestCode == SIGN_IN) {
-            if (resultCode == Activity.RESULT_OK) {
-                Log.d(TAG, "in ok");
-                Toast.makeText(this, "ok", Toast.LENGTH_SHORT).show();
-            }
-            if (resultCode == Activity.RESULT_CANCELED){
-                Toast.makeText(this, "canceled", Toast.LENGTH_SHORT).show();
-            }
-        }
-    }
+//    @Override
+//    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+//        super.onActivityResult(requestCode, resultCode, data);
+//
+//        if(requestCode == SIGN_IN) {
+//            if (resultCode == Activity.RESULT_OK) {
+//                Log.d(TAG, "in ok");
+//                Toast.makeText(this, "ok", Toast.LENGTH_SHORT).show();
+//            }
+//            if (resultCode == Activity.RESULT_CANCELED){
+//                Toast.makeText(this, "canceled", Toast.LENGTH_SHORT).show();
+//            }
+//        }
+//    }
     private void setupBottomNavigationView(){
 
         BottomNavigationViewEx bottomNavigationViewEx = (BottomNavigationViewEx) findViewById(R.id.bottomNavViewBar);

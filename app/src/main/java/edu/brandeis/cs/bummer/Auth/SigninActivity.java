@@ -1,6 +1,5 @@
-package edu.brandeis.cs.bummer;
+package edu.brandeis.cs.bummer.Auth;
 
-import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -16,6 +15,10 @@ import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 
+import edu.brandeis.cs.bummer.MainActivity;
+import edu.brandeis.cs.bummer.Utils.BaseActivity;
+import edu.brandeis.cs.bummer.R;
+
 public class SigninActivity extends BaseActivity implements
         View.OnClickListener {
 
@@ -28,6 +31,7 @@ public class SigninActivity extends BaseActivity implements
     // [START declare_auth]
     private FirebaseAuth mAuth;
     // [END declare_auth]
+    private FirebaseUser currentUser;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -48,12 +52,21 @@ public class SigninActivity extends BaseActivity implements
         // [END initialize_auth]
     }
 
+    public void onAuthStateChange() {
+        if (currentUser != null) {
+            Log.d(TAG, "current user = " + currentUser.getUid());
+            startActivity(new Intent(this, MainActivity.class));
+        }
+    }
+
+
     // [START on_start_check_user]
     @Override
     public void onStart() {
         super.onStart();
         // Check if user is signed in (non-null) and update UI accordingly.
-        FirebaseUser currentUser = mAuth.getCurrentUser();
+        this.currentUser = mAuth.getCurrentUser();
+        onAuthStateChange();
     }
     // [END on_start_check_user]
 

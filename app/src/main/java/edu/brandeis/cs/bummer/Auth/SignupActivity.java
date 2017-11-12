@@ -1,4 +1,4 @@
-package edu.brandeis.cs.bummer;
+package edu.brandeis.cs.bummer.Auth;
 
 import android.app.Activity;
 import android.content.Intent;
@@ -15,6 +15,9 @@ import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+
+import edu.brandeis.cs.bummer.Utils.BaseActivity;
+import edu.brandeis.cs.bummer.R;
 
 public class SignupActivity extends BaseActivity implements View.OnClickListener {
 

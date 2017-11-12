@@ -13,6 +13,10 @@
         android:theme="@style/AppTheme">
         <activity
             android:name=".MainActivity">
+        </activity>
+        <activity
+            android:name=".Auth.SigninActivity"
+            android:windowSoftInputMode="adjustResize">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -20,12 +24,7 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".SigninActivity"
-            android:windowSoftInputMode="adjustResize">
-
-        </activity>
-        <activity
-            android:name=".SignupActivity"
+            android:name=".Auth.SignupActivity"
             android:windowSoftInputMode="adjustResize">
         </activity>
         <activity android:name=".Post.PostActivity"/>
