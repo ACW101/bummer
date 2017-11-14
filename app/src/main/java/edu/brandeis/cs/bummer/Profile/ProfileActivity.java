@@ -20,7 +20,7 @@ import edu.brandeis.cs.bummer.Utils.BottomNavigationHelper;
 
 public class ProfileActivity extends AppCompatActivity{
     private Context mContext = ProfileActivity.this;
-    private static final int ACTIVITY_NUM = 0;
+    private static final int ACTIVITY_NUM = 2;
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
