@@ -7,6 +7,7 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
 import android.widget.ImageView;
 
 import com.ittianyu.bottomnavigationviewex.BottomNavigationViewEx;
@@ -26,16 +27,15 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
     private static final int SIGN_IN = 7;
     private static final int ACTIVITY_NUM = 0;
 
-    private Context mContext = MainActivity.this;
     private FirebaseUser currentUser;
 
     // [START declare_auth]
     private FirebaseAuth mAuth;
     // [END declare_auth]
+    private Context mContext = MainActivity.this;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        Log.d(TAG, "onCreate: ");
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         mAuth = FirebaseAuth.getInstance();
@@ -44,7 +44,6 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
         ImageView imageView = findViewById(R.id.ImageView);
         imageView.setImageResource(R.drawable.jp_monkey);
         setupBottomNavigationView();
-        mAuth.signOut();
     }
 
     @Override
@@ -76,5 +75,12 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
         MenuItem menuItem = menu.getItem(ACTIVITY_NUM);
         menuItem.setChecked(true);
     }
+
+
+    public void MapsHome(View view) {
+        Intent intent = new Intent(this, MapsActivity.class);
+        startActivity(intent);
+    }
+
 
 }

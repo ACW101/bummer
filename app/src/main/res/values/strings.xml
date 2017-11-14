@@ -77,4 +77,6 @@
     <string name="sign_up_ul"><u>Sign up</u></string>
     <string name="sign_in_ul"><u>Sign in</u></string>
     <string name="sign_up">Sign up</string>
+    <string name="title_activity_maps">Map</string>
+    <string name="sign_in">Sign in</string>
 </resources>
