@@ -28,11 +28,13 @@
             android:windowSoftInputMode="adjustResize">
         </activity>
 
-
         <activity
-            android:name=".MapsActivity"
-            android:label="@string/title_activity_maps">
-
+            android:name=".Post.PostActivity"
+            android:windowSoftInputMode="adjustResize">
+        </activity>
+        <activity
+            android:name=".Profile.ProfileActivity"
+            android:windowSoftInputMode="adjustResize">
         </activity>
         <meta-data
             android:name="com.google.android.geo.API_KEY"
