@@ -5,11 +5,13 @@ import android.util.Log;
 import android.widget.Toast;
 
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.UserInfo;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 
 import edu.brandeis.cs.bummer.Models.User;
+import edu.brandeis.cs.bummer.Models.UserData;
 import edu.brandeis.cs.bummer.R;
 
 /**
@@ -17,16 +19,15 @@ import edu.brandeis.cs.bummer.R;
  */
 
 public class FirebaseHelper {
+    private Context mContext;
     private static final String TAG = "FirebaseHelper";
-
     //firebase
     private FirebaseAuth mAuth;
     private FirebaseAuth.AuthStateListener mAuthListener;
     private FirebaseDatabase mFirebaseDatabase;
     private DatabaseReference mRef;
-    private String userID;
 
-    private Context mContext;
+    private String userID;
 
     public FirebaseHelper(Context context) {
         mAuth = FirebaseAuth.getInstance();
@@ -54,5 +55,21 @@ public class FirebaseHelper {
         mRef.child(mContext.getString(R.string.dbname_users))
                 .child(userID)
                 .setValue(newUser);
+    }
+
+    public UserData getUserData(DataSnapshot data) {
+        Log.d(TAG, "FirebaseHelper: getUserData: getting user's data from database");
+        UserData userData = null;
+
+        for (DataSnapshot ds : data.getChildren()) {
+             if (ds.getKey().equals(mContext.getString(R.string.dbname_usersData))) {
+                 Log.d(TAG, "FirebaseHelper: getUserInfo, getting userData");
+                 userData = ds.child(userID).getValue(UserData.class);
+             }
+        }
+        if (userData == null) {
+            Log.e(TAG, "FirebaseHelper: getUserData: error getting user data");
+        }
+        return userData;
     }
 }

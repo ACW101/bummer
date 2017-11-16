@@ -80,4 +80,5 @@
     <string name="dbname_users">users</string>
     <string name="hint_confirm_password">confirm password</string>
     <string name="hint_name">name</string>
+    <string name="dbname_usersData">usersdata</string>
 </resources>
