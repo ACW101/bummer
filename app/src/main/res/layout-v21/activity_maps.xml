@@ -1,17 +1,22 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<android.support.constraint.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android" android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:id="@+id/relLayoutParent">
 
 
         <fragment xmlns:android="http://schemas.android.com/apk/res/android"
-                xmlns:tools="http://schemas.android.com/tools"
-                android:id="@+id/map"
-                android:name="com.google.android.gms.maps.SupportMapFragment"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                tools:context="edu.brandeis.cs.bummer.MainActivity"/>
+        xmlns:map="http://schemas.android.com/apk/res-auto"
+        xmlns:tools="http://schemas.android.com/tools"
+        android:id="@+id/map"
+        android:name="com.google.android.gms.maps.SupportMapFragment"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        tools:context="edu.brandeis.cs.bummer.MapsActivity"/>
 
         <RelativeLayout
             android:layout_width="match_parent"
@@ -21,7 +26,7 @@
             android:layout_marginLeft="10dp"
             android:elevation="10dp"
             android:background="@drawable/white_border"
-            android:id="@+id/relLayout1">
+            android:id="@+id/rellayout1">
 
             <ImageView
                 android:layout_width="15dp"
@@ -30,7 +35,7 @@
                 android:layout_centerVertical="true"
                 android:layout_marginLeft="10dp"
                 android:src="@drawable/ic_magnify"
-                android:layout_marginStart="10dp"/>
+                android:layout_marginStart="10dp" />
 
             <EditText
                 android:layout_width="match_parent"
@@ -49,6 +54,8 @@
 
         <include layout="@layout/bottom_navi_bar"/>
     </RelativeLayout>
+
+</android.support.constraint.ConstraintLayout>
 
 
 

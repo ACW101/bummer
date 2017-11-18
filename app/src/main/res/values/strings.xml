@@ -78,4 +78,5 @@
     <string name="sign_in_ul"><u>Sign in</u></string>
     <string name="sign_up">Sign up</string>
     <string name="title_activity_maps">Map</string>
+    <string name="google_map_API_Key">AIzaSyBJUbJZxdNEAkb_3brnA6exQu0WlD3l5sE</string>
 </resources>
