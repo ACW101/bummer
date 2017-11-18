@@ -18,6 +18,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.WindowManager;
 import android.view.inputmethod.EditorInfo;
+import android.widget.AdapterView;
 import android.widget.AutoCompleteTextView;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -27,7 +28,10 @@ import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationServices;
+import com.google.android.gms.location.places.AutocompletePrediction;
 import com.google.android.gms.location.places.GeoDataClient;
+import com.google.android.gms.location.places.Place;
+import com.google.android.gms.location.places.PlaceBufferResponse;
 import com.google.android.gms.location.places.PlaceDetectionClient;
 import com.google.android.gms.location.places.Places;
 import com.google.android.gms.maps.CameraUpdateFactory;
@@ -49,7 +53,7 @@ import java.util.List;
 
 import edu.brandeis.cs.bummer.Auth.SigninActivity;
 import edu.brandeis.cs.bummer.Utils.BottomNavigationHelper;
-
+import edu.brandeis.cs.bummer.Utils.models.PlaceInfo;
 
 
 public class MainActivity extends FragmentActivity implements OnMapReadyCallback,
@@ -81,6 +85,7 @@ public class MainActivity extends FragmentActivity implements OnMapReadyCallback
     private PlaceAutocompleteAdapter mPlaceAutocompleteAdapter;
     private GeoDataClient mGeoDataClient;
     private PlaceDetectionClient mPlaceDetectionClient;
+    private PlaceInfo mPlace;
 
     // [START declare_auth]
     private FirebaseAuth mAuth;
@@ -151,6 +156,8 @@ public class MainActivity extends FragmentActivity implements OnMapReadyCallback
 
         // Construct a PlaceDetectionClient.
         mPlaceDetectionClient = Places.getPlaceDetectionClient(this, null);
+
+        mSearchText.setOnItemClickListener(mAutocompleteClickListener);
 
         mPlaceAutocompleteAdapter = new PlaceAutocompleteAdapter(this, mGeoDataClient,
                 LAT_LNG_BOUNDS, null);
@@ -312,6 +319,58 @@ public class MainActivity extends FragmentActivity implements OnMapReadyCallback
     private void hideSoftKeyboard(){
         this.getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN);
     }
+
+    /*
+         --------------- google places API autocomplete suggestions ------------
+     */
+    private AdapterView.OnItemClickListener mAutocompleteClickListener = new AdapterView.OnItemClickListener(){
+        @Override
+        public void onItemClick(AdapterView<?> adapterView, View view, int i, long l){
+            hideSoftKeyboard();
+
+            final AutocompletePrediction item = mPlaceAutocompleteAdapter.getItem(i);
+            final String placeId = item.getPlaceId();
+
+            Task<PlaceBufferResponse> placeResult = mGeoDataClient.getPlaceById(placeId);
+
+            placeResult.addOnCompleteListener(mUpdatePlaceDetailsComplete);
+        }
+    };
+
+    private OnCompleteListener<PlaceBufferResponse> mUpdatePlaceDetailsComplete = new OnCompleteListener<PlaceBufferResponse>() {
+        @Override
+        public void onComplete(@NonNull Task<PlaceBufferResponse> task) {
+            if (task.isSuccessful()) {
+                PlaceBufferResponse places = task.getResult();
+                Place myPlace = places.get(0);
+
+                try{
+                    mPlace = new PlaceInfo();
+                    mPlace.setName(myPlace.getName().toString());
+                    mPlace.setAddress(myPlace.getAddress().toString());
+//                    mPlace.setAttributions(myPlace.getAttributions().toString());
+                    mPlace.setWebsiteUri(myPlace.getWebsiteUri());
+                    mPlace.setPhoneNumber(myPlace.getPhoneNumber().toString());
+                    mPlace.setRating(myPlace.getRating());
+                    mPlace.setLatLng(myPlace.getLatLng());
+
+                    Log.d(TAG, "OnComplete: " + mPlace.toString());
+
+                }catch (NullPointerException e){
+                    Log.e(TAG,"OnResult: " + e.getMessage());
+                }
+
+                moveCamera(new LatLng(myPlace.getViewport().getCenter().latitude,
+                        myPlace.getViewport().getCenter().longitude), DEFAULT_ZOOM, mPlace.getName());
+                places.release();
+
+
+            } else {
+                Log.e(TAG, "Place not found.");
+            }
+        }
+    };
+
 
 
 }
