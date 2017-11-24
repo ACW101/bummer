@@ -4,37 +4,22 @@ import android.content.Context;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
-import android.util.Log;
-import android.view.Menu;
-import android.view.MenuItem;
 
-import com.ittianyu.bottomnavigationviewex.BottomNavigationViewEx;
-
+import edu.brandeis.cs.bummer.Profile.ProfileActivity;
 import edu.brandeis.cs.bummer.R;
-import edu.brandeis.cs.bummer.Utils.BottomNavigationHelper;
+
 
 /**
- * Created by yancheng on 2017/10/31.
+ * Created by CaiweiWu on 2017/11/23.
  */
 
 public class PostActivity extends AppCompatActivity {
     private Context mContext = PostActivity.this;
-    private static final int ACTIVITY_NUM = 1;
+    private static final int ACTIVITY_NUM = 2;
     @Override
-    protected void onCreate(@Nullable Bundle savedInstanceState) {
+    protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
-        setupBottomNavigationView();
-
+        setContentView(R.layout.activity_post);
     }
-    private void setupBottomNavigationView(){
 
-        BottomNavigationViewEx bottomNavigationViewEx = (BottomNavigationViewEx) findViewById(R.id.bottomNavViewBar);
-
-        BottomNavigationHelper.setupBottomNavigation(bottomNavigationViewEx);
-        BottomNavigationHelper.enableNavigation(mContext, this, bottomNavigationViewEx);
-        Menu menu = bottomNavigationViewEx.getMenu();
-        MenuItem menuItem = menu.getItem(ACTIVITY_NUM);
-        menuItem.setChecked(true);
-    }
 }

@@ -38,9 +38,12 @@ dependencies {
 
 
 apply plugin: 'com.google.gms.google-services'
-    dependencies {
-        compile 'com.google.android.gms:play-services-places:11.6.0'
-        compile 'com.google.android.gms:play-services-location:11.6.0'
-        compile 'com.google.android.gms:play-services-fitness:11.6.0'
-        compile 'com.google.android.gms:play-services-wearable:11.6.0'
-    }
+dependencies {
+    implementation 'com.android.support.constraint:constraint-layout:+'
+}
+dependencies {
+    compile 'com.google.android.gms:play-services-places:11.6.0'
+    compile 'com.google.android.gms:play-services-location:11.6.0'
+    compile 'com.google.android.gms:play-services-fitness:11.6.0'
+    compile 'com.google.android.gms:play-services-wearable:11.6.0'
+}
