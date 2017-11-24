@@ -33,7 +33,7 @@
             android:windowSoftInputMode="adjustResize"></activity>
         <activity
             android:name=".Post.PostActivity"
-            android:windowSoftInputMode="adjustResize"></activity>
+            android:windowSoftInputMode="adjustPan"></activity>
         <activity
             android:name=".Profile.ProfileActivity"
             android:windowSoftInputMode="adjustResize"></activity>
