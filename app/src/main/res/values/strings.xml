@@ -83,4 +83,5 @@
     <string name="bottom_post">Post</string>
     <string name="bottom_map">Map</string>
     <string name="hint">Say something</string>
+    <string name="share">Share</string>
 </resources>
