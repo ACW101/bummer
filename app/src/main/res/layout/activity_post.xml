@@ -21,6 +21,7 @@
                 android:layout_height="match_parent"
                 android:background="@drawable/rounded_edittext"
                 android:id="@+id/image"
+                android:src="@drawable/headshot"
                 />
             <EditText
                 android:id="@+id/input_text"
@@ -40,14 +41,24 @@
                 android:paddingTop="20dp" />
         </LinearLayout>
 
-        <Button
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:id="@+id/share"
-            android:text="@string/share"
-            android:layout_gravity="center"
-            />
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+                <Button
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:id="@+id/choose"
+                    android:text="Choose"
+                    android:layout_weight="1"/>
 
+                <Button
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:id="@+id/share"
+
+                    android:text="@string/share"
+                    android:layout_weight="1"/>
+            </LinearLayout>
     </LinearLayout>
 
 
