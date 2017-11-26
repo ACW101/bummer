@@ -95,7 +95,7 @@ public class SignupActivity extends BaseActivity implements View.OnClickListener
                         if (task.isSuccessful()) {
                             // Sign in success, update UI with the signed-in user's information
                             Log.d(TAG, "createUserWithEmail:success");
-                            FirebaseUser user = mAuth.getCurrentUser();
+                            sendEmailVerification();
                             Intent returnIntent = new Intent();
                             setResult(Activity.RESULT_OK, returnIntent);
                             finish();
@@ -152,10 +152,34 @@ public class SignupActivity extends BaseActivity implements View.OnClickListener
         if (i == R.id.email_sign_up_button) {
             createAccount();
         } else if (i == R.id.sign_in_textview) {
-            Intent returnIntent = new Intent();
-            setResult(Activity.RESULT_CANCELED, returnIntent);
-            finish();
+            startActivity(new Intent(mContext, SigninActivity.class));
         }
+    }
+
+    private void sendEmailVerification() {
+        // Send verification email
+        // [START send_email_verification]
+        Log.d(TAG, "sendEmailVeri: start sending email");
+        final FirebaseUser user = mAuth.getCurrentUser();
+        user.sendEmailVerification()
+                .addOnCompleteListener(this, new OnCompleteListener<Void>() {
+                    @Override
+                    public void onComplete(@NonNull Task<Void> task) {
+                        if (task.isSuccessful()) {
+                            Log.d(TAG, "sendEmailVer: send email veri success");
+                            Toast.makeText(mContext,
+                                    "Verification email sent to " + user.getEmail(),
+                                    Toast.LENGTH_SHORT).show();
+                        } else {
+                            Log.e(TAG, "sendEmailVerification", task.getException());
+                            Toast.makeText(mContext,
+                                    "Failed to send verification email." + task.getException(),
+                                    Toast.LENGTH_SHORT).show();
+                        }
+                        // [END_EXCLUDE]
+                    }
+                });
+        // [END send_email_verification]
     }
 
     private void initFirebase() {

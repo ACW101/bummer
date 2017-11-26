@@ -81,4 +81,7 @@
     <string name="hint_confirm_password">confirm password</string>
     <string name="hint_name">name</string>
     <string name="dbname_usersData">usersdata</string>
+    <string name="email_verification_prompt">Please check your e-mail for verification link</string>
+    <string name="resend_email">resend verification</string>
+    <string name="check_verification">check verification</string>
 </resources>

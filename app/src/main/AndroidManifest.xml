@@ -11,9 +11,7 @@
         android:roundIcon="@mipmap/bummer"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity
-            android:name=".MainActivity">
-        </activity>
+        <activity android:name=".MainActivity"></activity>
         <activity
             android:name=".Auth.SigninActivity"
             android:windowSoftInputMode="adjustResize">
@@ -25,20 +23,19 @@
         </activity>
         <activity
             android:name=".Auth.SignupActivity"
-            android:windowSoftInputMode="adjustResize">
-        </activity>
-
+            android:windowSoftInputMode="adjustResize"></activity>
         <activity
             android:name=".Post.PostActivity"
-            android:windowSoftInputMode="adjustResize">
-        </activity>
+            android:windowSoftInputMode="adjustResize"></activity>
         <activity
             android:name=".Profile.ProfileActivity"
-            android:windowSoftInputMode="adjustResize">
-        </activity>
+            android:windowSoftInputMode="adjustResize"></activity>
+
         <meta-data
             android:name="com.google.android.geo.API_KEY"
             android:value="AIzaSyBJUbJZxdNEAkb_3brnA6exQu0WlD3l5sE" />
+
+        <activity android:name=".Auth.EmailVerificationActivity"></activity>
     </application>
 
 </manifest>

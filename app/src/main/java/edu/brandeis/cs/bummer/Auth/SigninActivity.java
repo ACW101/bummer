@@ -1,7 +1,9 @@
 package edu.brandeis.cs.bummer.Auth;
 
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.annotation.MainThread;
 import android.support.annotation.NonNull;
 import android.text.TextUtils;
 import android.util.Log;
@@ -24,6 +26,7 @@ public class SigninActivity extends BaseActivity implements
 
     private static final String TAG = "EmailPassword";
     private static final int SIGN_UP = 8;
+    private static Context mContext;
 
     private EditText mEmailField;
     private EditText mPasswordField;
@@ -33,11 +36,13 @@ public class SigninActivity extends BaseActivity implements
     // [END declare_auth]
     private FirebaseUser currentUser;
 
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_signin);
 
+        mContext = this;
 
         // Buttons
         findViewById(R.id.email_sign_in_button).setOnClickListener(this);
@@ -53,9 +58,15 @@ public class SigninActivity extends BaseActivity implements
     }
 
     public void onAuthStateChange() {
+        this.currentUser = mAuth.getCurrentUser();
         if (currentUser != null) {
-            Log.d(TAG, "current user = " + currentUser.getUid());
-            startActivity(new Intent(this, MainActivity.class));
+            Log.d(TAG, "onAuthStateChange: current user = " + currentUser.getUid());
+            // direct to email verify if not verified
+            if (currentUser.isEmailVerified()) {
+                startActivity(new Intent(mContext, MainActivity.class));
+            } else {
+                startActivity(new Intent(mContext, EmailVerificationActivity.class));
+            }
         }
     }
 
@@ -64,8 +75,6 @@ public class SigninActivity extends BaseActivity implements
     @Override
     public void onStart() {
         super.onStart();
-        // Check if user is signed in (non-null) and update UI accordingly.
-        this.currentUser = mAuth.getCurrentUser();
         onAuthStateChange();
     }
     // [END on_start_check_user]
@@ -85,7 +94,7 @@ public class SigninActivity extends BaseActivity implements
                         if (task.isSuccessful()) {
                             // Sign in success, update UI with the signed-in user's information
                             Log.d(TAG, "signInWithEmail:success");
-                            FirebaseUser user = mAuth.getCurrentUser();
+                            onAuthStateChange();
                         } else {
                             // If sign in fails, display a message to the user.
                             Log.w(TAG, "signInWithEmail:failure", task.getException());
@@ -99,37 +108,6 @@ public class SigninActivity extends BaseActivity implements
                 });
         // [END sign_in_with_email]
     }
-
-//    private void sendEmailVerification() {
-//        // Disable button
-//        findViewById(R.id.verify_email_button).setEnabled(false);
-//
-//        // Send verification email
-//        // [START send_email_verification]
-//        final FirebaseUser user = mAuth.getCurrentUser();
-//        user.sendEmailVerification()
-//                .addOnCompleteListener(this, new OnCompleteListener<Void>() {
-//                    @Override
-//                    public void onComplete(@NonNull Task<Void> task) {
-//                        // [START_EXCLUDE]
-//                        // Re-enable button
-//                        findViewById(R.id.verify_email_button).setEnabled(true);
-//
-//                        if (task.isSuccessful()) {
-//                            Toast.makeText(SigninActivity.this,
-//                                    "Verification email sent to " + user.getEmail(),
-//                                    Toast.LENGTH_SHORT).show();
-//                        } else {
-//                            Log.e(TAG, "sendEmailVerification", task.getException());
-//                            Toast.makeText(SigninActivity.this,
-//                                    "Failed to send verification email." + task.getException(),
-//                                    Toast.LENGTH_SHORT).show();
-//                        }
-//                        // [END_EXCLUDE]
-//                    }
-//                });
-//        // [END send_email_verification]
-//    }
 
     private boolean validateForm() {
         boolean valid = true;
@@ -157,9 +135,11 @@ public class SigninActivity extends BaseActivity implements
     public void onClick(View v) {
         int i = v.getId();
         if (i == R.id.email_sign_in_button) {
+            Log.d(TAG, "onClick: email_sign_in_button: starting to sign in");
             signIn(mEmailField.getText().toString(), mPasswordField.getText().toString());
         } else if (i == R.id.sign_up_textview) {
-            startActivityForResult(new Intent(SigninActivity.this, SignupActivity.class), SIGN_UP);
+            Log.d(TAG, "onClick: email_sign_up_button: start sign-up intent");
+            startActivity(new Intent(SigninActivity.this, SignupActivity.class));
         }
     }
 }
