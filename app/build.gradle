@@ -36,16 +36,14 @@ dependencies {
     compile 'com.google.firebase:firebase-storage:11.6.0'
     testCompile 'junit:junit:4.12'
     compile 'com.github.ittianyu:BottomNavigationViewEx:1.2.3'
-}
 
-
-apply plugin: 'com.google.gms.google-services'
-dependencies {
-    implementation 'com.android.support.constraint:constraint-layout:+'
-}
-dependencies {
     compile 'com.google.android.gms:play-services-places:11.6.0'
     compile 'com.google.android.gms:play-services-location:11.6.0'
     compile 'com.google.android.gms:play-services-fitness:11.6.0'
     compile 'com.google.android.gms:play-services-wearable:11.6.0'
+
+    implementation 'com.android.support.constraint:constraint-layout:+'
+    // circular image view
+    compile 'de.hdodenhof:circleimageview:2.2.0'
 }
+apply plugin: 'com.google.gms.google-services'

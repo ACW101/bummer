@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+    <ImageView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:src="@drawable/ic_email"
+        android:layout_centerInParent="true"
+        android:id="@+id/email_ic"/>
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/email_ic"
+        android:layout_centerHorizontal="true"
+        android:text="@string/email_verification_prompt"
+        android:id="@+id/email_veri_prompt"/>
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/resend_email"
+        android:layout_centerHorizontal="true"
+        android:layout_below="@id/email_veri_prompt"
+        android:id="@+id/resend_btn"
+        />
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/check_verification"
+        android:layout_centerHorizontal="true"
+        android:layout_below="@id/resend_btn"
+        android:id="@+id/check_verification"
+        />
+</RelativeLayout>
