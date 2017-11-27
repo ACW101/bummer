@@ -15,6 +15,14 @@
       },
       "oauth_client": [
         {
+          "client_id": "697869236992-oju4bkn0pb8dnhq1o5pnikbal98ndch7.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "edu.brandeis.cs.bummer",
+            "certificate_hash": "c341ef4077cb94fa3467e886dbb4401b5052eee7"
+          }
+        },
+        {
           "client_id": "697869236992-hku64edtb7m1l4diijm1l6m6t8cnrush.apps.googleusercontent.com",
           "client_type": 1,
           "android_info": {

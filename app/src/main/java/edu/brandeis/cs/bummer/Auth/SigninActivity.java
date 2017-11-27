@@ -16,8 +16,10 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 
 import edu.brandeis.cs.bummer.MainActivity;
-import edu.brandeis.cs.bummer.Utils.BaseActivity;
 import edu.brandeis.cs.bummer.R;
+import edu.brandeis.cs.bummer.Utils.BaseActivity;
+
+
 
 public class SigninActivity extends BaseActivity implements
         View.OnClickListener {

@@ -78,6 +78,13 @@
     <string name="sign_in_ul"><u>Sign in</u></string>
     <string name="sign_up">Sign up</string>
     <string name="title_activity_maps">Map</string>
+
+    <string name="google_map_API_Key">AIzaSyBJUbJZxdNEAkb_3brnA6exQu0WlD3l5sE</string>
+    <string name="bottom_profile">Profile</string>
+    <string name="bottom_post">Post</string>
+    <string name="bottom_map">Map</string>
+    <string name="hint">Say something</string>
+    <string name="share">Share</string>
     <string name="hint">Say something...</string>
     <string name="bottom_map">Map</string>
     <string name="bottom_post">Post</string>
