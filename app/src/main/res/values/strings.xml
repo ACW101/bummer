@@ -84,4 +84,7 @@
     <string name="email_verification_prompt">Please check your e-mail for verification link</string>
     <string name="resend_email">resend verification</string>
     <string name="check_verification">check verification</string>
+    <string name="forget_password_text">Reset Password</string>
+    <string name="forget_password_empty_toast">Enter your email address to send the reset password email to</string>
+    <string name="forget_password_sent">Email sent to:</string>
 </resources>

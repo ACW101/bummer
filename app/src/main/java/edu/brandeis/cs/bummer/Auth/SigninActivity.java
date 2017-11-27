@@ -44,9 +44,10 @@ public class SigninActivity extends BaseActivity implements
 
         mContext = this;
 
-        // Buttons
+        // Buttons onclick listeners
         findViewById(R.id.email_sign_in_button).setOnClickListener(this);
         findViewById(R.id.sign_up_textview).setOnClickListener(this);
+        findViewById(R.id.forget_password_textview).setOnClickListener(this);
 
         // Views
         mEmailField = findViewById(R.id.field_email);
@@ -131,6 +132,25 @@ public class SigninActivity extends BaseActivity implements
         return valid;
     }
 
+    private void sendPasswordResetEmail() {
+        final String email = mEmailField.getText().toString();
+        if (email.length() == 0) {
+            Toast.makeText(mContext, getString(R.string.forget_password_empty_toast), Toast.LENGTH_LONG).show();
+            return;
+        }
+        mAuth.sendPasswordResetEmail(email)
+                .addOnCompleteListener(new OnCompleteListener<Void>() {
+                    @Override
+                    public void onComplete(@NonNull Task<Void> task) {
+                        if (task.isSuccessful()) {
+                            Toast.makeText(SigninActivity.this, getString(R.string.forget_password_sent) + email, Toast.LENGTH_SHORT).show();
+                        } else {
+                            Toast.makeText(SigninActivity.this, "fail sending reset email: " + task.getException(), Toast.LENGTH_SHORT).show();
+                        }
+                    }
+                });
+    }
+
     @Override
     public void onClick(View v) {
         int i = v.getId();
@@ -140,6 +160,9 @@ public class SigninActivity extends BaseActivity implements
         } else if (i == R.id.sign_up_textview) {
             Log.d(TAG, "onClick: email_sign_up_button: start sign-up intent");
             startActivity(new Intent(SigninActivity.this, SignupActivity.class));
+        } else if (i == R.id.forget_password_textview) {
+            Log.d(TAG, "onClick: forget_password_clicked: send reset email");
+            sendPasswordResetEmail();
         }
     }
 }
