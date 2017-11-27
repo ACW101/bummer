@@ -87,4 +87,12 @@
     <string name="forget_password_text">Reset Password</string>
     <string name="forget_password_empty_toast">Enter your email address to send the reset password email to</string>
     <string name="forget_password_sent">Email sent to:</string>
+    <string name="title_activity_maps">Map</string>
+
+    <string name="google_map_API_Key">AIzaSyBJUbJZxdNEAkb_3brnA6exQu0WlD3l5sE</string>
+    <string name="bottom_profile">Profile</string>
+    <string name="bottom_post">Post</string>
+    <string name="bottom_map">Map</string>
+    <string name="hint">Say something</string>
+    <string name="share">Share</string>
 </resources>

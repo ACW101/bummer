@@ -3,7 +3,11 @@
     package="edu.brandeis.cs.bummer">
 
     <uses-permission android:name="android.permission.INTERNET" />
-
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
+    <uses-feature android:glEsVersion="0x00020000" android:required="false"/>
     <application
         android:allowBackup="true"
         android:icon="@mipmap/bummer"
@@ -11,6 +15,9 @@
         android:roundIcon="@mipmap/bummer"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
+        <meta-data
+            android:name="com.google.android.gms.version"
+            android:value="@integer/google_play_services_version" />
         <activity android:name=".MainActivity"></activity>
         <activity
             android:name=".Auth.SigninActivity"
@@ -26,16 +33,16 @@
             android:windowSoftInputMode="adjustResize"></activity>
         <activity
             android:name=".Post.PostActivity"
-            android:windowSoftInputMode="adjustResize"></activity>
+            android:windowSoftInputMode="adjustPan"></activity>
         <activity
             android:name=".Profile.ProfileActivity"
             android:windowSoftInputMode="adjustResize"></activity>
+        <activity android:name=".Auth.EmailVerificationActivity"></activity>
 
         <meta-data
             android:name="com.google.android.geo.API_KEY"
             android:value="AIzaSyBJUbJZxdNEAkb_3brnA6exQu0WlD3l5sE" />
 
-        <activity android:name=".Auth.EmailVerificationActivity"></activity>
     </application>
 
 </manifest>

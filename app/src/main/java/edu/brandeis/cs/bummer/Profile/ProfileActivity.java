@@ -40,5 +40,4 @@ public class ProfileActivity extends AppCompatActivity{
         ft.commit();
 
     }
-
 }
