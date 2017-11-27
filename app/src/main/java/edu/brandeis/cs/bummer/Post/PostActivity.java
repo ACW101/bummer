@@ -40,6 +40,8 @@ import com.ittianyu.bottomnavigationviewex.BottomNavigationViewEx;
 
 import java.io.ByteArrayOutputStream;
 import com.google.firebase.storage.*;
+
+import edu.brandeis.cs.bummer.MainActivity;
 import edu.brandeis.cs.bummer.Utils.BottomNavigationHelper;
 import edu.brandeis.cs.bummer.Profile.ProfileActivity;
 import edu.brandeis.cs.bummer.R;
@@ -51,6 +53,9 @@ import edu.brandeis.cs.bummer.R;
  */
 
 public class PostActivity extends AppCompatActivity {
+    static final String TAG = "PostActivity";
+    private static final int ACTIVITY_NUM = 1;
+    private Context mContext = PostActivity.this;
     // Folder path for Firebase Storage.
     String Storage_Path = "All_Image_Uploads/";
 
@@ -61,7 +66,7 @@ public class PostActivity extends AppCompatActivity {
     Button ChooseButton, UploadButton;
 
     // Creating EditText.
-    EditText ImageName ;
+    EditText ImageName;
 
     // Creating ImageView.
     ImageView SelectImage;
@@ -76,7 +81,7 @@ public class PostActivity extends AppCompatActivity {
     // Image request code for onActivityResult() .
     int Image_Request_Code = 7;
 
-    ProgressDialog progressDialog ;
+    ProgressDialog progressDialog;
 
     Boolean CheckImageViewEditText;
 
@@ -92,14 +97,14 @@ public class PostActivity extends AppCompatActivity {
         databaseReference = FirebaseDatabase.getInstance().getReference(Database_Path);
 
         //Assign ID'S to button.
-        ChooseButton = (Button)findViewById(R.id.choose);
-        UploadButton = (Button)findViewById(R.id.share);
+        ChooseButton = (Button) findViewById(R.id.choose);
+        UploadButton = (Button) findViewById(R.id.share);
 
         // Assign ID's to EditText.
-        ImageName = (EditText)findViewById(R.id.input_text);
+        ImageName = (EditText) findViewById(R.id.input_text);
 
         // Assign ID'S to image view.
-        SelectImage = (ImageView)findViewById(R.id.image);
+        SelectImage = (ImageView) findViewById(R.id.image);
 
         // Assigning Id to ProgressDialog.
         progressDialog = new ProgressDialog(PostActivity.this);
@@ -131,6 +136,9 @@ public class PostActivity extends AppCompatActivity {
 
             }
         });
+
+        // setup buttom nav bar
+        setupBottomNavigationView();
     }
 
     @Override
@@ -153,8 +161,7 @@ public class PostActivity extends AppCompatActivity {
                 // After selecting image change choose button above text.
                 ChooseButton.setText("Image Selected");
 
-            }
-            catch (IOException e) {
+            } catch (IOException e) {
 
                 e.printStackTrace();
             }
@@ -169,7 +176,7 @@ public class PostActivity extends AppCompatActivity {
         MimeTypeMap mimeTypeMap = MimeTypeMap.getSingleton();
 
         // Returning the file Extension.
-        return mimeTypeMap.getExtensionFromMimeType(contentResolver.getType(uri)) ;
+        return mimeTypeMap.getExtensionFromMimeType(contentResolver.getType(uri));
 
     }
 
@@ -236,13 +243,23 @@ public class PostActivity extends AppCompatActivity {
 
                         }
                     });
-        }
-        else {
+        } else {
 
             Toast.makeText(PostActivity.this, "Please Select Image or Add Image Name", Toast.LENGTH_LONG).show();
 
         }
     }
+
+    private void setupBottomNavigationView(){
+        Log.d(TAG, "setupBottomNavigationView: setting up BottomNavigationView");
+        BottomNavigationViewEx bottomNavigationViewEx = (BottomNavigationViewEx) findViewById(R.id.bottomNavViewBar);
+        BottomNavigationHelper.setupBottomNavigation(bottomNavigationViewEx);
+        BottomNavigationHelper.enableNavigation(mContext, this, bottomNavigationViewEx);
+        Menu menu = bottomNavigationViewEx.getMenu();
+        MenuItem menuItem = menu.getItem(ACTIVITY_NUM);
+        menuItem.setChecked(true);
+    }
+}
 
 
 
@@ -318,16 +335,8 @@ public class PostActivity extends AppCompatActivity {
 
 
 
-//
-//    private void setupBottomNavigationView(){
-//        Log.d(TAG, "setupBottomNavigationView: setting up BottomNavigationView");
-//        BottomNavigationViewEx bottomNavigationViewEx = (BottomNavigationViewEx) findViewById(R.id.bottomNavViewBar);
-//        BottomNavigationHelper.setupBottomNavigation(bottomNavigationViewEx);
-//        BottomNavigationHelper.enableNavigation(mContext, this, bottomNavigationViewEx);
-//        Menu menu = bottomNavigationViewEx.getMenu();
-//        MenuItem menuItem = menu.getItem(ACTIVITY_NUM);
-//        menuItem.setChecked(true);
-//    }
+
+
 
 
 
