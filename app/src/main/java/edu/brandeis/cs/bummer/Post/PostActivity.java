@@ -245,8 +245,6 @@ public class PostActivity extends AppCompatActivity {
     }
 
 
-}
-
 
 //    FirebaseStorage storage = FirebaseStorage.getInstance();// Folder path for Firebase Storage.
 //    String Storage_Path = "All_Image_Uploads/";

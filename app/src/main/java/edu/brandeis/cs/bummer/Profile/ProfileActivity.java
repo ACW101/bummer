@@ -29,12 +29,12 @@ public class ProfileActivity extends AppCompatActivity{
     }
     private void setupBottomNavigationView(){
 
-        BottomNavigationViewEx bottomNavigationViewEx = (BottomNavigationViewEx) findViewById(R.id.bottomNavViewBar);
-
-        BottomNavigationHelper.setupBottomNavigation(bottomNavigationViewEx);
-        BottomNavigationHelper.enableNavigation(mContext, this, bottomNavigationViewEx);
-        Menu menu = bottomNavigationViewEx.getMenu();
-        MenuItem menuItem = menu.getItem(ACTIVITY_NUM);
-        menuItem.setChecked(true);
+//        BottomNavigationViewEx bottomNavigationViewEx = (BottomNavigationViewEx) findViewById(R.id.bottomNavViewBar);
+//
+//        BottomNavigationHelper.setupBottomNavigation(bottomNavigationViewEx);
+//        BottomNavigationHelper.enableNavigation(mContext, this, bottomNavigationViewEx);
+//        Menu menu = bottomNavigationViewEx.getMenu();
+//        MenuItem menuItem = menu.getItem(ACTIVITY_NUM);
+//        menuItem.setChecked(true);
     }
 }
