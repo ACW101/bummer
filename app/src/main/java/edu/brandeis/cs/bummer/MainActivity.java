@@ -4,9 +4,12 @@ import android.Manifest;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.location.Address;
 import android.location.Geocoder;
 import android.os.Bundle;
+import android.os.StrictMode;
 import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.FragmentActivity;
@@ -38,8 +41,10 @@ import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.LatLngBounds;
+import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
@@ -48,6 +53,8 @@ import com.google.firebase.auth.FirebaseUser;
 import com.ittianyu.bottomnavigationviewex.BottomNavigationViewEx;
 
 import java.io.IOException;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -86,6 +93,7 @@ public class MainActivity extends FragmentActivity implements OnMapReadyCallback
     private GeoDataClient mGeoDataClient;
     private PlaceDetectionClient mPlaceDetectionClient;
     private PlaceInfo mPlace;
+    private Marker myMarker;
 
     // [START declare_auth]
     private FirebaseAuth mAuth;
@@ -96,6 +104,10 @@ public class MainActivity extends FragmentActivity implements OnMapReadyCallback
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        if (android.os.Build.VERSION.SDK_INT > 9) {
+            StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
+            StrictMode.setThreadPolicy(policy);
+        }
         mAuth = FirebaseAuth.getInstance();
         mSearchText = (AutoCompleteTextView)findViewById(R.id.input_search);
         mGps = (ImageView)findViewById(R.id.ic_gps);
@@ -121,7 +133,6 @@ public class MainActivity extends FragmentActivity implements OnMapReadyCallback
         }
     }
 
-    @Override
     public void onMapReady(GoogleMap googleMap) {
         Toast.makeText(this, "Map is ready", Toast.LENGTH_SHORT).show();
         Log.d(TAG, "onMapReady: map is ready");
@@ -140,12 +151,44 @@ public class MainActivity extends FragmentActivity implements OnMapReadyCallback
 
         }
 
+        mMap.setOnMarkerClickListener(new GoogleMap.OnMarkerClickListener() {
 
-//        mMap.addMarker(new MarkerOptions()
-//                .icon(BitmapDescriptorFactory.fromResource(R.mipmap.bummer))
-//                .anchor(0.0f, 1.0f) // Anchors the marker on the bottom left
-//                .position(new LatLng(42.366998, -71.258864)));
+            public boolean onMarkerClick(final Marker marker) {
 
+                if (marker.equals(myMarker)) {
+                 Toast.makeText(MainActivity.this, "Marker is clicked", Toast.LENGTH_SHORT).show();
+                    Intent intent = new Intent(MainActivity.this, InfoActivity.class);
+                    startActivity(intent);
+                }
+                return true;
+            }
+        });
+
+        try {
+            URL url = new URL("https://firebasestorage.googleapis.com/v0/b/bummer-ec3a6.appspot.com/o/100%2Fthumb_puppy-1.jpg?alt=media&token=eb0166b6-6537-4f0a-89b7-a8dcf134f107");
+            Bitmap bmp = BitmapFactory.decodeStream(url.openConnection().getInputStream());
+            myMarker = mMap.addMarker(new MarkerOptions()
+                    .icon(BitmapDescriptorFactory.fromBitmap(bmp))
+                    .anchor(0.0f, 1.0f) // Anchors the marker on the bottom left
+                    .position(new LatLng(42.366998, -71.258864)));
+
+
+        } catch (MalformedURLException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public boolean onMarkerClick(final Marker marker) {
+
+        if (marker.equals(myMarker))
+        {
+            Toast.makeText(this, "Marker is clicked", Toast.LENGTH_SHORT).show();
+            Intent intent = new Intent(this, InfoActivity.class);
+            startActivity(intent);
+        }
+        return true;
     }
 
 
@@ -370,7 +413,8 @@ public class MainActivity extends FragmentActivity implements OnMapReadyCallback
             }
         }
     };
-
-
-
 }
+
+
+
+
