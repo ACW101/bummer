@@ -66,13 +66,15 @@ public class SignupActivity extends BaseActivity implements View.OnClickListener
         mPasswordConfirmField = findViewById(R.id.field_confirm_password);
         mNameField = findViewById(R.id.field_name);
 
+
+
         initFirebase();
     }
 
     @Override
     protected void onStart() {
         super.onStart();
-        mAuth.addAuthStateListener(mAuthListener);
+//        mAuth.addAuthStateListener(mAuthListener);
     }
 
     private void createAccount() {
@@ -93,7 +95,7 @@ public class SignupActivity extends BaseActivity implements View.OnClickListener
                     @Override
                     public void onComplete(@NonNull Task<AuthResult> task) {
                         if (task.isSuccessful()) {
-                            // Sign in success, update UI with the signed-in user's information
+                            // Sign up success
                             Log.d(TAG, "createUserWithEmail:success");
                             sendEmailVerification();
                             Intent returnIntent = new Intent();
@@ -167,6 +169,7 @@ public class SignupActivity extends BaseActivity implements View.OnClickListener
                     public void onComplete(@NonNull Task<Void> task) {
                         if (task.isSuccessful()) {
                             Log.d(TAG, "sendEmailVer: send email veri success");
+                            mFirebaseHelper.addUser(email, name);
                             Toast.makeText(mContext,
                                     "Verification email sent to " + user.getEmail(),
                                     Toast.LENGTH_SHORT).show();
@@ -189,29 +192,29 @@ public class SignupActivity extends BaseActivity implements View.OnClickListener
         mFirebaseDatabase = FirebaseDatabase.getInstance();
         mRef = mFirebaseDatabase.getReference();
 
-        mAuthListener = new FirebaseAuth.AuthStateListener() {
-            @Override
-            public void onAuthStateChanged(@NonNull FirebaseAuth firebaseAuth) {
-                FirebaseUser user = firebaseAuth.getCurrentUser();
-
-                if (user != null) {
-                    Log.d(TAG, "onAuthStateChanged: user is signed in " + user.getUid());
-                    mRef.addListenerForSingleValueEvent(new ValueEventListener() {
-                        @Override
-                        public void onDataChange(DataSnapshot dataSnapshot) {
-                            Log.d(TAG, "onDataChange: dataChange");
-                            mFirebaseHelper.addUser(email, name, "");
-                        }
-
-                        @Override
-                        public void onCancelled(DatabaseError databaseError) {
-                            Log.d(TAG, "onDataChange: cancelled");
-                        }
-                    });
-                } else {
-                    Log.d(TAG, "onAuthStateChanged: user is signed out");
-                }
-            }
-        };
+//        mAuthListener = new FirebaseAuth.AuthStateListener() {
+//            @Override
+//            public void onAuthStateChanged(@NonNull FirebaseAuth firebaseAuth) {
+//                FirebaseUser user = firebaseAuth.getCurrentUser();
+//
+//                if (user != null) {
+//                    Log.d(TAG, "onAuthStateChanged: user is signed in " + user.getUid());
+//                    mRef.addListenerForSingleValueEvent(new ValueEventListener() {
+//                        @Override
+//                        public void onDataChange(DataSnapshot dataSnapshot) {
+//                            Log.d(TAG, "onDataChange: dataChange");
+//                            mFirebaseHelper.addUser(email, name);
+//                        }
+//
+//                        @Override
+//                        public void onCancelled(DatabaseError databaseError) {
+//                            Log.d(TAG, "onDataChange: cancelled");
+//                        }
+//                    });
+//                } else {
+//                    Log.d(TAG, "onAuthStateChanged: user is signed out");
+//                }
+//            }
+//        };
     }
 }

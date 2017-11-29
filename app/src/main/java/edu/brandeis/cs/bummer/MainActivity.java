@@ -6,6 +6,7 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.location.Address;
 import android.location.Geocoder;
+import android.net.ConnectivityManager;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
@@ -45,6 +46,7 @@ import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.Logger;
 import com.ittianyu.bottomnavigationviewex.BottomNavigationViewEx;
 
 import java.io.IOException;
@@ -52,7 +54,10 @@ import java.util.ArrayList;
 import java.util.List;
 
 import edu.brandeis.cs.bummer.Auth.SigninActivity;
+import edu.brandeis.cs.bummer.Models.PostData;
 import edu.brandeis.cs.bummer.Utils.BottomNavigationHelper;
+import edu.brandeis.cs.bummer.Utils.LocationData;
+import edu.brandeis.cs.bummer.Utils.MapDataHelper;
 import edu.brandeis.cs.bummer.Utils.models.PlaceInfo;
 
 
@@ -69,8 +74,8 @@ public class MainActivity extends FragmentActivity implements OnMapReadyCallback
     private static final String Coarse_Location = Manifest.permission.ACCESS_COARSE_LOCATION;
     private static final int Location_Permission_Request_Code = 1234;
     private static final float DEFAULT_ZOOM = 15f;
-    private static final double CURRENT_LATTITUTE = 42.366998;
-    private static final double CURRENT_LONGTITUTE = -71.258864;
+    private static final double CURRENT_LATTITUTE = 42.3669;
+    private static final double CURRENT_LONGTITUTE = -71.2583;
     private static final LatLngBounds LAT_LNG_BOUNDS = new LatLngBounds(
             new LatLng(-40, -168), new LatLng(71, 168));
 
@@ -87,10 +92,9 @@ public class MainActivity extends FragmentActivity implements OnMapReadyCallback
     private PlaceDetectionClient mPlaceDetectionClient;
     private PlaceInfo mPlace;
 
-    // [START declare_auth]
     private FirebaseAuth mAuth;
-    // [END declare_auth]
     private Context mContext = MainActivity.this;
+    private MapDataHelper mapDataHelper;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -99,8 +103,6 @@ public class MainActivity extends FragmentActivity implements OnMapReadyCallback
         mAuth = FirebaseAuth.getInstance();
         mSearchText = (AutoCompleteTextView)findViewById(R.id.input_search);
         mGps = (ImageView)findViewById(R.id.ic_gps);
-
-
         getLocationPermission();
 
         // Buttons
@@ -139,13 +141,12 @@ public class MainActivity extends FragmentActivity implements OnMapReadyCallback
             init();
 
         }
+    }
 
+    private boolean isNetworkConnected() {
+        ConnectivityManager cm = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
 
-//        mMap.addMarker(new MarkerOptions()
-//                .icon(BitmapDescriptorFactory.fromResource(R.mipmap.bummer))
-//                .anchor(0.0f, 1.0f) // Anchors the marker on the bottom left
-//                .position(new LatLng(42.366998, -71.258864)));
-
+        return cm.getActiveNetworkInfo() != null;
     }
 
 
@@ -229,6 +230,10 @@ public class MainActivity extends FragmentActivity implements OnMapReadyCallback
 //                             Location currentLocation = (Location)task.getResult();
                              moveCamera(new LatLng(CURRENT_LATTITUTE, CURRENT_LONGTITUTE),
                                      DEFAULT_ZOOM, "My Location");
+
+                             // get image informations
+                             mapDataHelper = new MapDataHelper(mContext, CURRENT_LATTITUTE, CURRENT_LONGTITUTE);
+
                          } else {
                              Log.d(TAG, "onComplete: current location is null");
                              Toast.makeText(MainActivity.this, "unable to get current location", Toast.LENGTH_SHORT).show();
@@ -372,4 +377,10 @@ public class MainActivity extends FragmentActivity implements OnMapReadyCallback
         }
     };
 
+    public void updateMarker(LocationData locationData) {
+        Log.d(TAG, "updating marker");
+        for (PostData post : locationData.getPosts()) {
+            Log.d(TAG, post.getImageURL());
+        }
+    }
 }
