@@ -4,10 +4,13 @@ import android.Manifest;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.location.Address;
 import android.location.Geocoder;
 import android.net.ConnectivityManager;
 import android.os.Bundle;
+import android.os.StrictMode;
 import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.FragmentActivity;
@@ -25,6 +28,10 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.request.FutureTarget;
+import com.bumptech.glide.request.target.SimpleTarget;
+import com.bumptech.glide.request.transition.Transition;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.FusedLocationProviderClient;
@@ -39,8 +46,11 @@ import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.BitmapDescriptor;
+import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.LatLngBounds;
+import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
@@ -50,8 +60,12 @@ import com.google.firebase.database.Logger;
 import com.ittianyu.bottomnavigationviewex.BottomNavigationViewEx;
 
 import java.io.IOException;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.FutureTask;
 
 import edu.brandeis.cs.bummer.Auth.SigninActivity;
 import edu.brandeis.cs.bummer.Models.PostData;
@@ -96,6 +110,9 @@ public class MainActivity extends FragmentActivity implements OnMapReadyCallback
     private Context mContext = MainActivity.this;
     private MapDataHelper mapDataHelper;
 
+    // google map
+    ArrayList<Marker> markerList;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -104,6 +121,13 @@ public class MainActivity extends FragmentActivity implements OnMapReadyCallback
         mSearchText = (AutoCompleteTextView)findViewById(R.id.input_search);
         mGps = (ImageView)findViewById(R.id.ic_gps);
         getLocationPermission();
+
+        if (android.os.Build.VERSION.SDK_INT > 9) {
+            StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
+            StrictMode.setThreadPolicy(policy);
+        }
+
+//        mAuth.signOut();
 
         // Buttons
         setupBottomNavigationView();
@@ -378,9 +402,44 @@ public class MainActivity extends FragmentActivity implements OnMapReadyCallback
     };
 
     public void updateMarker(LocationData locationData) {
+         markerList = new ArrayList<>();
+        int markerNum = 0;
         Log.d(TAG, "updating marker");
         for (PostData post : locationData.getPosts()) {
             Log.d(TAG, post.getImageURL());
+            final Marker mk = mMap.addMarker(new MarkerOptions()
+                    .anchor(0.0f, 1.0f) // Anchors the marker on the bottom left
+                    .position(new LatLng(CURRENT_LATTITUTE , CURRENT_LONGTITUTE + markerNum * 0.005 - 0.01)));
+            mk.setTag(markerNum);
+            markerList.add(mk);
+            try {
+                URL url = new URL(post.getImageURL());
+                Glide.with(mContext).asBitmap().load(url).into(new SimpleTarget<Bitmap>() {
+                    @Override
+                    public void onResourceReady(Bitmap resource, Transition<? super Bitmap> transition) {
+                        BitmapDescriptor icon = BitmapDescriptorFactory.fromBitmap(resource);
+                        mk.setIcon(icon);
+                    }
+                });
+            } catch (MalformedURLException e) {
+                e.printStackTrace();
+            }
+            mMap.setOnMarkerClickListener(new GoogleMap.OnMarkerClickListener() {
+                public boolean onMarkerClick(final Marker marker) {
+                    Toast.makeText(MainActivity.this, "Marker "  + marker.getTag() + "is clicked", Toast.LENGTH_SHORT).show();
+//                        Intent intent = new Intent(MainActivity.this, InfoActivity.class);
+//                        startActivity(intent);
+                    return true;
+                }
+            });
+
+            markerNum++;
         }
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+
     }
 }
