@@ -17,7 +17,6 @@
         <meta-data
             android:name="com.google.android.gms.version"
             android:value="@integer/google_play_services_version" />
-
         <activity android:name=".MainActivity"></activity>
         <activity
             android:name=".Auth.SigninActivity"
@@ -37,6 +36,7 @@
         <activity
             android:name=".Profile.ProfileActivity"
             android:windowSoftInputMode="adjustResize"></activity>
+        <activity android:name=".Auth.EmailVerificationActivity"></activity>
 
         <meta-data
             android:name="com.google.android.geo.API_KEY"
