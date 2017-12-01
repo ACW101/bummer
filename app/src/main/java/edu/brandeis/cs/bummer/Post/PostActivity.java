@@ -1,9 +1,12 @@
 package edu.brandeis.cs.bummer.Post;
 
+import android.Manifest;
 import android.app.ProgressDialog;
 import android.content.ContentResolver;
 import android.content.Context;
+import android.content.pm.PackageManager;
 import android.provider.MediaStore;
+import android.support.v4.app.ActivityCompat;
 import android.view.View;
 
 import java.io.File;
@@ -12,6 +15,7 @@ import java.lang.Object;
 import android.content.Intent;
 import android.graphics.Bitmap;
 
+import com.google.android.gms.common.images.ImageManager;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.*;
@@ -33,18 +37,22 @@ import android.widget.Toast;
 
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
 import com.ittianyu.bottomnavigationviewex.BottomNavigationViewEx;
 
 import java.io.ByteArrayOutputStream;
+
+
 import com.google.firebase.storage.*;
 
 import edu.brandeis.cs.bummer.MainActivity;
 import edu.brandeis.cs.bummer.Utils.BottomNavigationHelper;
 import edu.brandeis.cs.bummer.Profile.ProfileActivity;
 import edu.brandeis.cs.bummer.R;
+import edu.brandeis.cs.bummer.Utils.Permissions;
 
 
 
@@ -53,9 +61,12 @@ import edu.brandeis.cs.bummer.R;
  */
 
 public class PostActivity extends AppCompatActivity {
+    private static final int  CAMERA_REQUEST_CODE = 5;
+    private static final int VERIFY_PERMISSIONS_REQUEST = 1;
     static final String TAG = "PostActivity";
     private static final int ACTIVITY_NUM = 1;
     private Context mContext = PostActivity.this;
+    private Bitmap bitmap;
     // Folder path for Firebase Storage.
     String Storage_Path = "All_Image_Uploads/";
 
@@ -63,7 +74,7 @@ public class PostActivity extends AppCompatActivity {
     String Database_Path = "All_Image_Uploads_Database";
 
     // Creating button.
-    Button ChooseButton, UploadButton;
+    Button ChooseButton, UploadButton, CameraButton;
 
     // Creating EditText.
     EditText ImageName;
@@ -99,6 +110,7 @@ public class PostActivity extends AppCompatActivity {
         //Assign ID'S to button.
         ChooseButton = (Button) findViewById(R.id.choose);
         UploadButton = (Button) findViewById(R.id.share);
+        CameraButton = (Button) findViewById(R.id.camera);
 
         // Assign ID's to EditText.
         ImageName = (EditText) findViewById(R.id.input_text);
@@ -123,6 +135,24 @@ public class PostActivity extends AppCompatActivity {
                 startActivityForResult(Intent.createChooser(intent, "Please Select Image"), Image_Request_Code);
 
             }
+        });
+        if(checkPermissionsArray(edu.brandeis.cs.bummer.Utils.Permissions.PERMISSIONS)){
+
+        }else{
+            verifyPermissions(edu.brandeis.cs.bummer.Utils.Permissions.PERMISSIONS);
+        }
+        CameraButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+
+                if((checkPermissions(Manifest.permission.CAMERA))) {
+                    Log.d(TAG, "onClick: starting camera");
+                    Intent cameraIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+                    startActivityForResult(cameraIntent, CAMERA_REQUEST_CODE);
+                }
+            }
+
+
         });
 
 
@@ -153,10 +183,10 @@ public class PostActivity extends AppCompatActivity {
             try {
 
                 // Getting selected image into Bitmap.
-                Bitmap bitmap = MediaStore.Images.Media.getBitmap(getContentResolver(), FilePathUri);
+                Bitmap bm = MediaStore.Images.Media.getBitmap(getContentResolver(), FilePathUri);
 
                 // Setting up bitmap selected image into ImageView.
-                SelectImage.setImageBitmap(bitmap);
+                SelectImage.setImageBitmap(bm);
 
                 // After selecting image change choose button above text.
                 ChooseButton.setText("Image Selected");
@@ -165,6 +195,61 @@ public class PostActivity extends AppCompatActivity {
 
                 e.printStackTrace();
             }
+        }
+        else if(requestCode == CAMERA_REQUEST_CODE){
+            Log.d(TAG, "onActivityResult: done taking a photo.");
+            Log.d(TAG, "onActivityResult: attempting to navigate to final share screen.");
+
+
+            bitmap = (Bitmap) data.getExtras().get("data");
+
+
+            try{
+                Log.d(TAG, "onActivityResult: received new bitmap from camera: " + bitmap);
+                // Setting up bitmap selected image into ImageView.
+                SelectImage.setImageBitmap(bitmap);
+
+
+            }catch (NullPointerException e){
+                Log.d(TAG, "onActivityResult: NullPointerException: " + e.getMessage());
+            }
+
+
+        }
+    }
+    public void verifyPermissions(String[] permissions){
+        Log.d(TAG, "verifyPermissions: verifying permissions.");
+
+        ActivityCompat.requestPermissions(
+                PostActivity.this,
+                permissions,
+                VERIFY_PERMISSIONS_REQUEST
+        );
+    }
+    public boolean checkPermissionsArray(String[] permissions){
+        Log.d(TAG, "checkPermissionsArray: checking permissions array.");
+
+        for(int i = 0; i< permissions.length; i++){
+            String check = permissions[i];
+            if(!checkPermissions(check)){
+                return false;
+            }
+        }
+        return true;
+    }
+
+    public boolean checkPermissions(String permission){
+        Log.d(TAG, "checkPermissions: checking permission: " + permission);
+
+        int permissionRequest = ActivityCompat.checkSelfPermission(PostActivity.this, permission);
+
+        if(permissionRequest != PackageManager.PERMISSION_GRANTED){
+            Log.d(TAG, "checkPermissions: \n Permission was not granted for: " + permission);
+            return false;
+        }
+        else{
+            Log.d(TAG, "checkPermissions: \n Permission was granted for: " + permission);
+            return true;
         }
     }
 
@@ -218,6 +303,10 @@ public class PostActivity extends AppCompatActivity {
 
                             // Adding image upload id s child element into databaseReference.
                             databaseReference.child(ImageUploadId).setValue(imageUploadInfo);
+
+                            //navigate to the main feed so the user can see their photo
+                            Intent intent = new Intent(mContext, MainActivity.class);
+                            mContext.startActivity(intent);
                         }
                     })
                     // If something goes wrong .
@@ -243,13 +332,75 @@ public class PostActivity extends AppCompatActivity {
 
                         }
                     });
-        } else {
+        }
+        else if (bitmap != null) {
+
+            StorageReference storageReference2nd = storageReference.child(Storage_Path + System.currentTimeMillis() + "." + "jpg");
+
+
+            Log.e(TAG, "UploadImageFileToFirebaseStorage: " );
+            byte[] bytes = getBytesFromBitmap(bitmap, 100);
+
+
+            UploadTask uploadTask = null;
+            uploadTask = storageReference2nd.putBytes(bytes);
+
+            uploadTask.addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
+                @Override
+                public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
+                    Uri firebaseUrl = taskSnapshot.getDownloadUrl();
+
+                    Toast.makeText(mContext, "photo upload success", Toast.LENGTH_SHORT).show();
+
+
+                    // Getting image name from EditText and store into string variable.
+                    String TempImageName = ImageName.getText().toString().trim();
+
+                    // Hiding the progressDialog after done uploading.
+                    progressDialog.dismiss();
+
+                    // Showing toast message after done uploading.
+                    Toast.makeText(getApplicationContext(), "Image Uploaded Successfully ", Toast.LENGTH_LONG).show();
+
+                    @SuppressWarnings("VisibleForTests")
+                    ImageUploadInfo imageUploadInfo = new ImageUploadInfo(TempImageName, taskSnapshot.getDownloadUrl().toString());
+
+                    // Getting image upload ID.
+                    String ImageUploadId = databaseReference.push().getKey();
+
+                    // Adding image upload id s child element into databaseReference.
+                    databaseReference.child(ImageUploadId).setValue(imageUploadInfo);
+
+                    //navigate to the main feed so the user can see their photo
+                    Intent intent = new Intent(mContext, MainActivity.class);
+                    mContext.startActivity(intent);
+                }
+            }).addOnFailureListener(new OnFailureListener() {
+                @Override
+                public void onFailure(@NonNull Exception e) {
+                    Log.d(TAG, "onFailure: Photo upload failed.");
+                    Toast.makeText(mContext, "Photo upload failed ", Toast.LENGTH_SHORT).show();
+                }
+            }).addOnProgressListener(new OnProgressListener<UploadTask.TaskSnapshot>() {
+                @Override
+                public void onProgress(UploadTask.TaskSnapshot taskSnapshot) {
+                    // Setting progressDialog Title.
+                    progressDialog.setTitle("Image is Uploading...");
+                }
+            });
+
+        }
+        else {
 
             Toast.makeText(PostActivity.this, "Please Select Image or Add Image Name", Toast.LENGTH_LONG).show();
 
         }
     }
-
+    public static byte[] getBytesFromBitmap(Bitmap bm, int quality){
+        ByteArrayOutputStream stream = new ByteArrayOutputStream();
+        bm.compress(Bitmap.CompressFormat.JPEG, quality, stream);
+        return stream.toByteArray();
+    }
     private void setupBottomNavigationView(){
         Log.d(TAG, "setupBottomNavigationView: setting up BottomNavigationView");
         BottomNavigationViewEx bottomNavigationViewEx = (BottomNavigationViewEx) findViewById(R.id.bottomNavViewBar);
@@ -260,6 +411,8 @@ public class PostActivity extends AppCompatActivity {
         menuItem.setChecked(true);
     }
 }
+
+
 
 
 
