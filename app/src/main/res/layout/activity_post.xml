@@ -66,6 +66,12 @@
                 android:layout_weight="1"/>
 
         </LinearLayout>
+        <Button
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:drawableLeft="@drawable/ic_locate"
+            android:text=""
+            android:id="@+id/btn_post_loc"/>
         <!--map-->
         <ImageView
             android:layout_width="match_parent"

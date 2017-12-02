@@ -5,8 +5,12 @@ import android.app.ProgressDialog;
 import android.content.ContentResolver;
 import android.content.Context;
 import android.content.pm.PackageManager;
+import android.location.Address;
+import android.location.Geocoder;
+import android.location.Location;
 import android.provider.MediaStore;
 import android.support.v4.app.ActivityCompat;
+import android.support.v4.content.ContextCompat;
 import android.view.View;
 
 import java.io.File;
@@ -16,8 +20,13 @@ import android.content.Intent;
 import android.graphics.Bitmap;
 
 import com.google.android.gms.common.images.ImageManager;
+import com.google.android.gms.location.FusedLocationProviderClient;
+import com.google.android.gms.location.LocationServices;
+import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.gms.tasks.Task;
 import com.google.firebase.*;
 
 import android.net.Uri;
@@ -44,6 +53,7 @@ import com.google.firebase.storage.UploadTask;
 import com.ittianyu.bottomnavigationviewex.BottomNavigationViewEx;
 
 import java.io.ByteArrayOutputStream;
+import java.util.List;
 
 
 import com.google.firebase.storage.*;
@@ -67,20 +77,25 @@ public class PostActivity extends AppCompatActivity {
     private static final int ACTIVITY_NUM = 1;
     private Context mContext = PostActivity.this;
     private Bitmap bitmap;
+
+    private List<Address> addresses = null;
     // Folder path for Firebase Storage.
     String Storage_Path = "All_Image_Uploads/";
 
     // Root Database Name for Firebase Database.
-    String Database_Path = "All_Image_Uploads_Database";
+    //String Database_Path = "All_Image_Uploads_Database";
+    String Database_Path = "location";
 
     // Creating button.
-    Button ChooseButton, UploadButton, CameraButton;
+    Button ChooseButton, UploadButton, CameraButton, LocateButton;
 
     // Creating EditText.
     EditText ImageName;
 
     // Creating ImageView.
     ImageView SelectImage;
+
+
 
     // Creating URI.
     Uri FilePathUri;
@@ -89,10 +104,28 @@ public class PostActivity extends AppCompatActivity {
     StorageReference storageReference;
     DatabaseReference databaseReference;
 
+
+
     // Image request code for onActivityResult() .
     int Image_Request_Code = 7;
 
+    private static final double CURRENT_LATTITUTE = 42.3669;
+    private static final double CURRENT_LONGTITUTE = -71.2583;
+
+    private FusedLocationProviderClient mFusedLocationClient;
+
     ProgressDialog progressDialog;
+
+    private Boolean mLocationPermissionGranted = false;
+
+    private String intentLocation = "";
+
+    private static final String Fine_Location = Manifest.permission.ACCESS_FINE_LOCATION;
+    private static final String Coarse_Location = Manifest.permission.ACCESS_COARSE_LOCATION;
+    private static final int Location_Permission_Request_Code = 1234;
+
+    private Location location_pri = new Location("dummyProvider");
+
 
     Boolean CheckImageViewEditText;
 
@@ -100,6 +133,9 @@ public class PostActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_post);
+
+        location_pri.setLatitude(CURRENT_LATTITUTE);
+        location_pri.setLongitude(CURRENT_LONGTITUTE);
 
         // Assign FirebaseStorage instance to storageReference.
         storageReference = FirebaseStorage.getInstance().getReference();
@@ -111,6 +147,9 @@ public class PostActivity extends AppCompatActivity {
         ChooseButton = (Button) findViewById(R.id.choose);
         UploadButton = (Button) findViewById(R.id.share);
         CameraButton = (Button) findViewById(R.id.camera);
+        LocateButton = (Button) findViewById(R.id.btn_post_loc);
+
+        getLocationPermission();
 
         // Assign ID's to EditText.
         ImageName = (EditText) findViewById(R.id.input_text);
@@ -166,10 +205,22 @@ public class PostActivity extends AppCompatActivity {
 
             }
         });
+        LocateButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Log.d(TAG, "onClick: clicked gps icon");
+                getDeviceLocation();
+                Log.d(TAG, "onClick: locationbtn" + intentLocation);
+
+
+            }
+        });
+
 
         // setup buttom nav bar
         setupBottomNavigationView();
     }
+
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
@@ -295,18 +346,23 @@ public class PostActivity extends AppCompatActivity {
                             // Showing toast message after done uploading.
                             Toast.makeText(getApplicationContext(), "Image Uploaded Successfully ", Toast.LENGTH_LONG).show();
 
+                            //Get location file path
+                            String loc_path = toLatLonBin(location_pri.getLatitude(), location_pri.getAltitude());
+                            Log.e(TAG, "onSuccess: " + loc_path);
+
                             @SuppressWarnings("VisibleForTests")
                             ImageUploadInfo imageUploadInfo = new ImageUploadInfo(TempImageName, taskSnapshot.getDownloadUrl().toString());
 
                             // Getting image upload ID.
-                            String ImageUploadId = databaseReference.push().getKey();
+                            String ImageUploadId = databaseReference.child(loc_path).push().getKey();
 
                             // Adding image upload id s child element into databaseReference.
-                            databaseReference.child(ImageUploadId).setValue(imageUploadInfo);
+                            databaseReference.child(loc_path)
+                                    .child(ImageUploadId).setValue(imageUploadInfo);
 
-                            //navigate to the main feed so the user can see their photo
+                            /*//navigate to the main feed so the user can see their photo
                             Intent intent = new Intent(mContext, MainActivity.class);
-                            mContext.startActivity(intent);
+                            mContext.startActivity(intent);*/
                         }
                     })
                     // If something goes wrong .
@@ -335,7 +391,7 @@ public class PostActivity extends AppCompatActivity {
         }
         else if (bitmap != null) {
 
-            StorageReference storageReference2nd = storageReference.child(Storage_Path + System.currentTimeMillis() + "." + "jpg");
+            StorageReference storageReference2nd = storageReference.child(Storage_Path + System.currentTimeMillis());
 
 
             Log.e(TAG, "UploadImageFileToFirebaseStorage: " );
@@ -362,18 +418,24 @@ public class PostActivity extends AppCompatActivity {
                     // Showing toast message after done uploading.
                     Toast.makeText(getApplicationContext(), "Image Uploaded Successfully ", Toast.LENGTH_LONG).show();
 
+                    //Get location file path
+                    String loc_path = toLatLonBin(location_pri.getLatitude(), location_pri.getAltitude());
+                    Log.e(TAG, "onSuccess: " + loc_path);
+
+
                     @SuppressWarnings("VisibleForTests")
                     ImageUploadInfo imageUploadInfo = new ImageUploadInfo(TempImageName, taskSnapshot.getDownloadUrl().toString());
 
                     // Getting image upload ID.
-                    String ImageUploadId = databaseReference.push().getKey();
+                    String ImageUploadId = databaseReference.child(loc_path).push().getKey();
 
                     // Adding image upload id s child element into databaseReference.
-                    databaseReference.child(ImageUploadId).setValue(imageUploadInfo);
+                    databaseReference.child(loc_path)
+                            .child(ImageUploadId).setValue(imageUploadInfo);
 
-                    //navigate to the main feed so the user can see their photo
+                    /*//navigate to the main feed so the user can see their photo
                     Intent intent = new Intent(mContext, MainActivity.class);
-                    mContext.startActivity(intent);
+                    mContext.startActivity(intent);*/
                 }
             }).addOnFailureListener(new OnFailureListener() {
                 @Override
@@ -396,6 +458,14 @@ public class PostActivity extends AppCompatActivity {
 
         }
     }
+    /*
+     * Get the String representation in DB of LatLon
+     */
+    public static String toLatLonBin(double lat, double lon) {
+        double newLat = Math.round(lat * 10000) / 10000.0;
+        double newLon = Math.round(lon * 10000) / 10000.0;
+        return (newLat + "x" + newLon).replace('.', '_');
+    }
     public static byte[] getBytesFromBitmap(Bitmap bm, int quality){
         ByteArrayOutputStream stream = new ByteArrayOutputStream();
         bm.compress(Bitmap.CompressFormat.JPEG, quality, stream);
@@ -410,6 +480,95 @@ public class PostActivity extends AppCompatActivity {
         MenuItem menuItem = menu.getItem(ACTIVITY_NUM);
         menuItem.setChecked(true);
     }
+    public void getDeviceLocation(){
+        Log.d(TAG,"getDeviceLocation: getting the devices current location");
+        mFusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
+        try{
+            if(mLocationPermissionGranted){
+                final Task location = mFusedLocationClient.getLastLocation();
+                location.addOnCompleteListener(new OnCompleteListener() {
+                    @Override
+                    public void onComplete(@NonNull Task task) {
+                        String errorMessage = "";
+
+                        if (task.isSuccessful()) {
+                            Log.d(TAG, "onComplete: found location");
+
+
+                            if ((Location)task.getResult() == null){
+                                Log.d(TAG, "onComplete: intentLoc "+ CURRENT_LATTITUTE);
+
+                                //intentLocation = CURRENT_LATTITUTE+ "*" + CURRENT_LONGTITUTE;
+
+                            } else {
+                                location_pri = (Location)task.getResult();
+                                //intentLocation = location_pri.getLatitude()+ "*" + location_pri.getLongitude();
+                                Log.d(TAG, "onComplete: intentLoc"+ location_pri.getLatitude() + " " + location_pri.getLongitude());
+
+
+
+                            }
+                            Geocoder geocoder = new Geocoder(PostActivity.this);
+                            try {
+                                addresses = geocoder.getFromLocation(
+                                        location_pri.getLatitude(),
+                                        location_pri.getLongitude(),
+                                        // In this sample, get just a single address.
+                                        1);
+
+                                StringBuilder sb = new StringBuilder(addresses.get(0).getAddressLine(0));
+                                sb.append(",");
+                                sb.append(addresses.get(0).getAddressLine(1));
+                                sb.append(",");
+                                sb.append(addresses.get(0).getAddressLine(2));
+
+
+                                LocateButton.setText(sb.toString());
+                            } catch (IOException ioException) {
+                                // Catch network or other I/O problems.
+                                errorMessage = getString(R.string.service_not_available);
+                                Log.e(TAG, errorMessage, ioException);
+                            } catch (IllegalArgumentException illegalArgumentException) {
+                                // Catch invalid latitude or longitude values.
+                                errorMessage = getString(R.string.invalid_lat_long_used);
+                                Log.e(TAG, errorMessage + ". " +
+                                        "Latitude = " + location_pri.getLatitude() +
+                                        ", Longitude = " +
+                                        location_pri.getLongitude(), illegalArgumentException);
+                            }
+
+
+
+
+                        } else {
+                            Log.d(TAG, "onComplete: current location is null");
+                        }
+                    }
+                });
+            }
+
+        }catch(SecurityException e){
+            Log.e(TAG,"getDeviceLocation: SecurityException: " + e.getMessage());
+        }
+    }
+
+
+    public void getLocationPermission() {
+        Log.d(TAG,"Getting location permissions");
+        String[] permissions = {android.Manifest.permission.ACCESS_FINE_LOCATION,
+                Manifest.permission.ACCESS_COARSE_LOCATION};
+        if (ContextCompat.checkSelfPermission(this.getApplicationContext(), Fine_Location) == PackageManager.PERMISSION_GRANTED){
+            if(ContextCompat.checkSelfPermission(this.getApplicationContext(), Coarse_Location) == PackageManager.PERMISSION_GRANTED){
+                mLocationPermissionGranted = true;
+
+            }else{
+                ActivityCompat.requestPermissions(this,permissions,Location_Permission_Request_Code);
+            }
+        }else{
+            ActivityCompat.requestPermissions(this,permissions,Location_Permission_Request_Code);
+        }
+    }
+
 }
 
 
