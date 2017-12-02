@@ -70,25 +70,6 @@ public class MapDataHelper {
         mFirebaseDatabase = FirebaseDatabase.getInstance();
         mRef = mFirebaseDatabase.getReference();
         mFirebaseHelper = new FirebaseHelper(mContext);
-
-        // add connection listener
-        DatabaseReference connectedRef = FirebaseDatabase.getInstance().getReference(".info/connected");
-        connectedRef.addValueEventListener(new ValueEventListener() {
-            @Override
-            public void onDataChange(DataSnapshot snapshot) {
-                boolean connected = snapshot.getValue(Boolean.class);
-                if (connected) {
-                    Toast.makeText(mContext, "connected to firebase", Toast.LENGTH_SHORT).show();
-                } else {
-                    Toast.makeText(mContext, "disconnect from firebase", Toast.LENGTH_SHORT).show();
-                }
-            }
-
-            @Override
-            public void onCancelled(DatabaseError error) {
-                System.err.println("Listener was cancelled");
-            }
-        });
     }
 
     private void getMapData() {
