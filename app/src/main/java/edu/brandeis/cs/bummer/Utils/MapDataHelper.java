@@ -15,6 +15,8 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
+import java.text.DecimalFormat;
+
 import edu.brandeis.cs.bummer.MainActivity;
 import edu.brandeis.cs.bummer.Models.PostData;
 
@@ -26,7 +28,7 @@ public class MapDataHelper {
     private static final String TAG = "MapDataHelper";
     private Context mContext;
     private double lat, lon;
-    private String lonLatBinName;
+    private String latLonBinName;
     private LocationData locationData;
 
     // firebase stuff
@@ -36,18 +38,30 @@ public class MapDataHelper {
     private DatabaseReference mRef;
     private FirebaseAuth.AuthStateListener mAuthListener;
 
-    public MapDataHelper(Context mContext, double lat, double lon) {
+    public MapDataHelper(Context mContext) {
         Log.d(TAG, "MapDataHelper: constructor");
-        this.lat = lat;
-        this.lon = lon;
-        this.lonLatBinName = toLatLonBin(lat, lon);
-        Log.d(TAG, "binname: " + lonLatBinName);
         this.mContext = mContext;
         setupFirebase();
     }
 
+    public void updateLocation(double lat, double lon) {
+        Log.d(TAG, "updateLatLon: lat=" + lat + " lon=" + lon );
+        this.lat = lat;
+        this.lon = lon;
+        this.latLonBinName = toLatLonBin(lat, lon);
+        Log.d(TAG, "binname: " + this.latLonBinName);
+
+        Log.d(TAG, "updateLocation: getting new data");
+        getMapData();
+    }
+
+    /*
+     * Get the String representation in DB of LatLon
+     */
     public static String toLatLonBin(double lat, double lon) {
-        return String.format("%.4fx%.4f", lon, lat).replace('.', '_');
+        double newLat = Math.round(lat * 10000) / 10000.0;
+        double newLon = Math.round(lon * 10000) / 10000.0;
+        return (newLat + "x" + newLon).replace('.', '_');
     }
 
     public void setupFirebase() {
@@ -57,45 +71,9 @@ public class MapDataHelper {
         mRef = mFirebaseDatabase.getReference();
         mFirebaseHelper = new FirebaseHelper(mContext);
 
-        mAuthListener = new FirebaseAuth.AuthStateListener() {
-            @Override
-            public void onAuthStateChanged(@NonNull FirebaseAuth firebaseAuth) {
-                FirebaseUser user = firebaseAuth.getCurrentUser();
-
-
-                if (user != null) {
-                    // User is signed in
-                    Log.d(TAG, "onAuthStateChanged:signed_in:" + user.getUid());
-                } else {
-                    // User is signed out
-                    Log.d(TAG, "onAuthStateChanged:signed_out");
-                }
-                // ...
-            }
-        };
-        // add AuthListener
-        mAuth.addAuthStateListener(mAuthListener);
-
-        mRef.addValueEventListener(new ValueEventListener() {
-            @Override
-            public void onDataChange(DataSnapshot dataSnapshot) {
-                Log.d(TAG, "onDataChange: data change");
-                // get the photos from lonLatBinName
-                locationData = mFirebaseHelper.getLocationData(dataSnapshot, lonLatBinName);
-                MainActivity ma = (MainActivity) mContext;
-                ma.updateMarker(locationData);
-            }
-
-
-            @Override
-            public void onCancelled(DatabaseError databaseError) {
-                Log.d(TAG, "onCancelled: cancelled" + databaseError);
-            }
-        });
-
         // add connection listener
         DatabaseReference connectedRef = FirebaseDatabase.getInstance().getReference(".info/connected");
-        connectedRef.addListenerForSingleValueEvent(new ValueEventListener() {
+        connectedRef.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot snapshot) {
                 boolean connected = snapshot.getValue(Boolean.class);
@@ -109,6 +87,28 @@ public class MapDataHelper {
             @Override
             public void onCancelled(DatabaseError error) {
                 System.err.println("Listener was cancelled");
+            }
+        });
+    }
+
+    private void getMapData() {
+        mRef.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                Log.d(TAG, "onDataChange: data change");
+                // get the photos from lonLatBinName
+                if (latLonBinName != null) {
+                    Log.d(TAG, "onDataChange: getting location data from firebase" +  latLonBinName);
+                    locationData = mFirebaseHelper.getLocationData(dataSnapshot, latLonBinName);
+                    MainActivity ma = (MainActivity) mContext;
+                    ma.updateMarker(locationData);
+                }
+            }
+
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+                Log.d(TAG, "onCancelled: cancelled" + databaseError);
             }
         });
     }
