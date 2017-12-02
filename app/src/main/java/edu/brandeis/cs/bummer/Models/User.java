@@ -5,38 +5,23 @@ package edu.brandeis.cs.bummer.Models;
  */
 
 public class User {
-    private String name;
-    private String user_id;
     private String email;
-    private String username;
+    private String name;
+    private long posts;
+    private long explored;
+    private long views;
     private String profile_photo;
 
-    public User(String user_id, String email, String name, String profile_photo) {
-        this.user_id = user_id;
-        this.username = username;
-        this.name = name;
-        this.email = email;
-        this.profile_photo = profile_photo;
-    }
-
-    // empty constructor for firebase
-    public User() {
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public String getUser_id() {
-        return user_id;
-    }
-
-    public void setUser_id(String user_id) {
-        this.user_id = user_id;
+    @Override
+    public String toString() {
+        return "User{" +
+                "email='" + email + '\'' +
+                ", name='" + name + '\'' +
+                ", posts=" + posts +
+                ", explored=" + explored +
+                ", views=" + views +
+                ", profile_photo='" + profile_photo + '\'' +
+                '}';
     }
 
     public String getEmail() {
@@ -47,6 +32,38 @@ public class User {
         this.email = email;
     }
 
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public long getPosts() {
+        return posts;
+    }
+
+    public void setPosts(long posts) {
+        this.posts = posts;
+    }
+
+    public long getExplored() {
+        return explored;
+    }
+
+    public void setExplored(long explored) {
+        this.explored = explored;
+    }
+
+    public long getViews() {
+        return views;
+    }
+
+    public void setViews(long views) {
+        this.views = views;
+    }
+
     public String getProfile_photo() {
         return profile_photo;
     }
@@ -55,4 +72,17 @@ public class User {
         this.profile_photo = profile_photo;
     }
 
+    public User() {
+
+    }
+
+    public User(String email, String name, long posts, long explored, long views, String profile_photo) {
+
+        this.email = email;
+        this.name = name;
+        this.posts = posts;
+        this.explored = explored;
+        this.views = views;
+        this.profile_photo = profile_photo;
+    }
 }

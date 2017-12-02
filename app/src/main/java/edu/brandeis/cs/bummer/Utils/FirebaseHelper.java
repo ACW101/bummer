@@ -5,13 +5,12 @@ import android.util.Log;
 import android.widget.Toast;
 
 import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.auth.UserInfo;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 
+import edu.brandeis.cs.bummer.Models.PostData;
 import edu.brandeis.cs.bummer.Models.User;
-import edu.brandeis.cs.bummer.Models.UserData;
 import edu.brandeis.cs.bummer.R;
 
 /**
@@ -40,7 +39,7 @@ public class FirebaseHelper {
         }
     }
 
-    public void addUser(String email, String name, String profile_photo) {
+    public void addUser(String email, String name) {
         if (mAuth.getCurrentUser() != null) {
             Log.d(TAG, "addUser: user is signed in");
             userID = mAuth.getCurrentUser().getUid();
@@ -50,26 +49,45 @@ public class FirebaseHelper {
             return;
         }
         // create a new user in db
-        User newUser = new User(userID, email, name, profile_photo);
+        User newUser = new User(email, name, 0,0,0,"");
         Log.d(TAG, "userID: " + userID);
         mRef.child(mContext.getString(R.string.dbname_users))
                 .child(userID)
                 .setValue(newUser);
     }
 
-    public UserData getUserData(DataSnapshot data) {
-        Log.d(TAG, "FirebaseHelper: getUserData: getting user's data from database");
-        UserData userData = null;
+    public User getUser(DataSnapshot data) {
+        Log.d(TAG, "FirebaseHelper: getUser: getting user's data from database");
+        User user = null;
 
         for (DataSnapshot ds : data.getChildren()) {
-             if (ds.getKey().equals(mContext.getString(R.string.dbname_usersData))) {
+             if (ds.getKey().equals(mContext.getString(R.string.dbname_users))) {
                  Log.d(TAG, "FirebaseHelper: getUserInfo, getting userData");
-                 userData = ds.child(userID).getValue(UserData.class);
+                 user = ds.child(userID).getValue(User.class);
              }
         }
-        if (userData == null) {
+        if (user == null) {
             Log.e(TAG, "FirebaseHelper: getUserData: error getting user data");
         }
-        return userData;
+        return user;
+    }
+
+    public LocationData getLocationData(DataSnapshot data, String location) {
+        Log.d(TAG, "FirebaseHelper: getLocationData: getting location data from database");
+        LocationData locationData = new LocationData(location);
+
+        for (DataSnapshot ds : data.getChildren()) {
+            if (ds.getKey().equals(mContext.getString(R.string.dbname_location))) {
+                Log.d(TAG, "FirebaseHelper: getUserInfo, getting userData");
+                DataSnapshot locationDataSnapshot = ds.child(location);
+                if (locationDataSnapshot.exists()) {
+                    for (DataSnapshot childs : locationDataSnapshot.getChildren()) {
+                        Log.d(TAG, "FirebaseHelper: getLocationData: getting PostData");
+                        locationData.append(childs.getValue(PostData.class));
+                    }
+                }
+            }
+        }
+        return locationData;
     }
 }

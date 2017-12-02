@@ -10,11 +10,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.GridView;
-import android.widget.ImageView;
-import android.widget.ProgressBar;
 import android.widget.TextView;
-import android.widget.Toolbar;
 
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
@@ -23,13 +19,8 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
-import com.ittianyu.bottomnavigationviewex.BottomNavigationViewEx;
 
-import org.w3c.dom.Text;
-
-import de.hdodenhof.circleimageview.CircleImageView;
 import edu.brandeis.cs.bummer.Models.User;
-import edu.brandeis.cs.bummer.Models.UserData;
 import edu.brandeis.cs.bummer.R;
 import edu.brandeis.cs.bummer.Utils.FirebaseHelper;
 
@@ -125,7 +116,7 @@ public class ProfileFragment extends Fragment {
             public void onDataChange(DataSnapshot dataSnapshot) {
 
                 //retrieve user information from the database
-                setProfileData(mFirebaseHelper.getUserData(dataSnapshot));
+                setProfileData(mFirebaseHelper.getUser(dataSnapshot));
                 //retrieve images for the user in question
             }
 
@@ -136,7 +127,7 @@ public class ProfileFragment extends Fragment {
         });
     }
 
-    private void setProfileData(UserData userData) {
-        mPosts.setText(String.valueOf(userData.getPosts()));
+    private void setProfileData(User userData) {
+        Log.d(TAG, "setting profile data");
     }
 }
