@@ -59,6 +59,15 @@
         android:id="@+id/ic_gps"
         android:src="@drawable/ic_gps"/>
 
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentEnd="true"
+        android:layout_alignParentRight="true"
+        android:layout_below="@+id/ic_gps"
+        android:text="signout"
+        android:id="@+id/signout_btn"/>
+
     <include layout="@layout/bottom_navi_bar"/>
 </RelativeLayout>
 

@@ -379,15 +379,16 @@ public class PostActivity extends AppCompatActivity {
                 // Adding image upload id s child element into databaseReference.
                 databaseReference.child(loc_path).child(ImageUploadId).setValue(imageUploadInfo);
 
+                addToDBUserPhoto(imageUploadInfo, ImageUploadId);
 
                 //kevin:
                 //databaseReference.child(loc_path).push().setValue(imageUploadInfo);
 
 
 
-                    /*//navigate to the main feed so the user can see their photo
-                    Intent intent = new Intent(mContext, MainActivity.class);
-                    mContext.startActivity(intent);*/
+                //navigate to the main feed so the user can see their photo
+                Intent intent = new Intent(mContext, MainActivity.class);
+                mContext.startActivity(intent);
             }
         }).addOnFailureListener(new OnFailureListener() {
             @Override
@@ -409,11 +410,12 @@ public class PostActivity extends AppCompatActivity {
 
     }
     //TODO
-    public void addToDBUserPhoto(ImageUploadInfo imageUploadInfo) {
-        String newPhotoKey = databaseReference.child("photo").push().getKey();
-        databaseReference.child("user_photos")
-                .child(FirebaseAuth.getInstance().getCurrentUser()
-                        .getUid()).child(newPhotoKey).setValue(imageUploadInfo);
+    public void addToDBUserPhoto(ImageUploadInfo imageUploadInfo, String photoKey) {
+
+        String Database_Path = "user_photos";
+        databaseReference = FirebaseDatabase.getInstance().getReference(Database_Path);
+        databaseReference.child(FirebaseAuth.getInstance().getCurrentUser()
+                        .getUid()).child(photoKey).setValue(imageUploadInfo);
 
     }
     /*

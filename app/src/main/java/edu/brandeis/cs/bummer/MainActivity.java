@@ -20,6 +20,7 @@ import android.view.WindowManager;
 import android.view.inputmethod.EditorInfo;
 import android.widget.AdapterView;
 import android.widget.AutoCompleteTextView;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -86,6 +87,7 @@ public class MainActivity extends FragmentActivity implements OnMapReadyCallback
     private GeoDataClient mGeoDataClient;
     private PlaceDetectionClient mPlaceDetectionClient;
     private PlaceInfo mPlace;
+    private Button signout_btn;
 
     // [START declare_auth]
     private FirebaseAuth mAuth;
@@ -103,11 +105,20 @@ public class MainActivity extends FragmentActivity implements OnMapReadyCallback
         mSearchText = (AutoCompleteTextView)findViewById(R.id.input_search);
         mGps = (ImageView)findViewById(R.id.ic_gps);
 
+        signout_btn = (Button) findViewById(R.id.signout_btn);
 
         getLocationPermission();
 
         // Buttons
         setupBottomNavigationView();
+
+        signout_btn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                mAuth.signOut();
+
+            }
+        });
     }
 
     @Override

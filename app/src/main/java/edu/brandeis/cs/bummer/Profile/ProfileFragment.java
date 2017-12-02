@@ -137,6 +137,6 @@ public class ProfileFragment extends Fragment {
     }
 
     private void setProfileData(UserData userData) {
-        mPosts.setText(String.valueOf(userData.getPosts()));
+        //mPosts.setText(String.valueOf(userData.getPosts()));
     }
 }
