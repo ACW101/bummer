@@ -5,6 +5,7 @@ import android.app.ProgressDialog;
 import android.content.ContentResolver;
 import android.content.Context;
 import android.content.pm.PackageManager;
+import android.graphics.BitmapFactory;
 import android.location.Address;
 import android.location.Geocoder;
 import android.location.Location;
@@ -14,6 +15,8 @@ import android.support.v4.content.ContextCompat;
 import android.view.View;
 
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.lang.Object;
 import android.content.Intent;
@@ -44,6 +47,7 @@ import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.Toast;
 
+import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 
@@ -320,146 +324,97 @@ public class PostActivity extends AppCompatActivity {
     public void UploadImageFileToFirebaseStorage() {
 
         // Checking whether FilePathUri Is empty or not.
-        if (FilePathUri != null) {
 
-            // Setting progressDialog Title.
-            progressDialog.setTitle("Image is Uploading...");
+        StorageReference storageReference2nd = storageReference.child(Storage_Path + System.currentTimeMillis());
 
-            // Showing progressDialog.
-            progressDialog.show();
+        if(bitmap == null){
+            try {
 
-            // Creating second StorageReference.
-            StorageReference storageReference2nd = storageReference.child(Storage_Path + System.currentTimeMillis() + "." + GetFileExtension(FilePathUri));
+                // Getting selected image into Bitmap.
+                bitmap = MediaStore.Images.Media.getBitmap(getContentResolver(), FilePathUri);
 
-            // Adding addOnSuccessListener to second StorageReference.
-            storageReference2nd.putFile(FilePathUri)
-                    .addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
-                        @Override
-                        public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
 
-                            // Getting image name from EditText and store into string variable.
-                            String TempImageName = ImageName.getText().toString().trim();
+            } catch (IOException e) {
 
-                            // Hiding the progressDialog after done uploading.
-                            progressDialog.dismiss();
-
-                            // Showing toast message after done uploading.
-                            Toast.makeText(getApplicationContext(), "Image Uploaded Successfully ", Toast.LENGTH_LONG).show();
-
-                            //Get location file path
-                            String loc_path = toLatLonBin(location_pri.getLatitude(), location_pri.getLongitude());
-                            Log.e(TAG, "onSuccess: " + loc_path);
-
-                            @SuppressWarnings("VisibleForTests")
-                            ImageUploadInfo imageUploadInfo = new ImageUploadInfo(TempImageName, taskSnapshot.getDownloadUrl().toString());
-
-                            // Getting image upload ID.
-                            databaseReference.child(loc_path).push().setValue(imageUploadInfo);
-
-                            // Adding image upload id s child element into databaseReference.
-//                            databaseReference.child(loc_path)
-//                                    .child(ImageUploadId).setValue(imageUploadInfo);
-
-                            /*//navigate to the main feed so the user can see their photo
-                            Intent intent = new Intent(mContext, MainActivity.class);
-                            mContext.startActivity(intent);*/
-                        }
-                    })
-                    // If something goes wrong .
-                    .addOnFailureListener(new OnFailureListener() {
-                        @Override
-                        public void onFailure(@NonNull Exception exception) {
-
-                            // Hiding the progressDialog.
-                            progressDialog.dismiss();
-
-                            // Showing exception erro message.
-                            Toast.makeText(PostActivity.this, exception.getMessage(), Toast.LENGTH_LONG).show();
-                        }
-                    })
-
-                    // On progress change upload time.
-                    .addOnProgressListener(new OnProgressListener<UploadTask.TaskSnapshot>() {
-                        @Override
-                        public void onProgress(UploadTask.TaskSnapshot taskSnapshot) {
-
-                            // Setting progressDialog Title.
-                            progressDialog.setTitle("Image is Uploading...");
-
-                        }
-                    });
+                e.printStackTrace();
+            }
         }
-        else if (bitmap != null) {
-
-            StorageReference storageReference2nd = storageReference.child(Storage_Path + System.currentTimeMillis());
 
 
-            Log.e(TAG, "UploadImageFileToFirebaseStorage: " );
-            byte[] bytes = getBytesFromBitmap(bitmap, 100);
+        byte[] bytes = getBytesFromBitmap(bitmap, 100);
 
 
-            UploadTask uploadTask = null;
-            uploadTask = storageReference2nd.putBytes(bytes);
+        UploadTask uploadTask = null;
+        uploadTask = storageReference2nd.putBytes(bytes);
 
-            uploadTask.addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
-                @Override
-                public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
-                    Uri firebaseUrl = taskSnapshot.getDownloadUrl();
+        uploadTask.addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
+            @Override
+            public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
+                Uri firebaseUrl = taskSnapshot.getDownloadUrl();
 
-                    Toast.makeText(mContext, "photo upload success", Toast.LENGTH_SHORT).show();
-
-
-                    // Getting image name from EditText and store into string variable.
-                    String TempImageName = ImageName.getText().toString().trim();
-
-                    // Hiding the progressDialog after done uploading.
-                    progressDialog.dismiss();
-
-                    // Showing toast message after done uploading.
-                    Toast.makeText(getApplicationContext(), "Image Uploaded Successfully ", Toast.LENGTH_LONG).show();
-
-                    //Get location file path
-                    String loc_path = toLatLonBin(location_pri.getLatitude(), location_pri.getAltitude());
-                    Log.e(TAG, "onSuccess: " + loc_path);
+                Toast.makeText(mContext, "photo upload success", Toast.LENGTH_SHORT).show();
 
 
-                    @SuppressWarnings("VisibleForTests")
-                    ImageUploadInfo imageUploadInfo = new ImageUploadInfo(TempImageName, taskSnapshot.getDownloadUrl().toString());
+                // Getting image name from EditText and store into string variable.
+                String TempImageName = ImageName.getText().toString().trim();
 
-                    // Getting image upload ID.
-                    //String ImageUploadId = databaseReference.child(loc_path).push().getKey();
+                // Hiding the progressDialog after done uploading.
+                progressDialog.dismiss();
+
+                // Showing toast message after done uploading.
+                Toast.makeText(getApplicationContext(), "Image Uploaded Successfully ", Toast.LENGTH_LONG).show();
+
+                //Get location file path
+                String loc_path = toLatLonBin(location_pri.getLatitude(), location_pri.getLongitude());
+                Log.e(TAG, "onSuccess: " + loc_path);
 
 
+                @SuppressWarnings("VisibleForTests")
+                ImageUploadInfo imageUploadInfo = new ImageUploadInfo(TempImageName, taskSnapshot.getDownloadUrl().toString());
 
-                    databaseReference.child(loc_path).push().setValue(imageUploadInfo);
-                    // Adding image upload id s child element into databaseReference.
-                    /*databaseReference.child(loc_path)
-                            .child(ImageUploadId).setValue(imageUploadInfo);*/
+                // Getting image upload ID.
+                String ImageUploadId = databaseReference.child(loc_path).push().getKey();
+
+
+                // Adding image upload id s child element into databaseReference.
+                databaseReference.child(loc_path).child(ImageUploadId).setValue(imageUploadInfo);
+
+
+                //kevin:
+                //databaseReference.child(loc_path).push().setValue(imageUploadInfo);
+
+
 
                     /*//navigate to the main feed so the user can see their photo
                     Intent intent = new Intent(mContext, MainActivity.class);
                     mContext.startActivity(intent);*/
-                }
-            }).addOnFailureListener(new OnFailureListener() {
-                @Override
-                public void onFailure(@NonNull Exception e) {
-                    Log.d(TAG, "onFailure: Photo upload failed.");
-                    Toast.makeText(mContext, "Photo upload failed ", Toast.LENGTH_SHORT).show();
-                }
-            }).addOnProgressListener(new OnProgressListener<UploadTask.TaskSnapshot>() {
-                @Override
-                public void onProgress(UploadTask.TaskSnapshot taskSnapshot) {
-                    // Setting progressDialog Title.
-                    progressDialog.setTitle("Image is Uploading...");
-                }
-            });
+            }
+        }).addOnFailureListener(new OnFailureListener() {
+            @Override
+            public void onFailure(@NonNull Exception e) {
+                Log.d(TAG, "onFailure: Photo upload failed.");
+                Toast.makeText(mContext, "Photo upload failed ", Toast.LENGTH_SHORT).show();
+            }
+        }).addOnProgressListener(new OnProgressListener<UploadTask.TaskSnapshot>() {
+            @Override
+            public void onProgress(UploadTask.TaskSnapshot taskSnapshot) {
+                // Setting progressDialog Title.
+                progressDialog.setTitle("Image is Uploading...");
+            }
+        });
 
-        }
-        else {
 
-            Toast.makeText(PostActivity.this, "Please Select Image or Add Image Name", Toast.LENGTH_LONG).show();
 
-        }
+
+
+    }
+    //TODO
+    public void addToDBUserPhoto(ImageUploadInfo imageUploadInfo) {
+        String newPhotoKey = databaseReference.child("photo").push().getKey();
+        databaseReference.child("user_photos")
+                .child(FirebaseAuth.getInstance().getCurrentUser()
+                        .getUid()).child(newPhotoKey).setValue(imageUploadInfo);
+
     }
     /*
      * Get the String representation in DB of LatLon
