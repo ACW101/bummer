@@ -186,6 +186,8 @@ public class MainActivity extends FragmentActivity implements OnMapReadyCallback
 
         // reset UI on bottom nav bar
         setupBottomNavigationView();
+
+        //mAuth.signOut();
     }
 
     @Override

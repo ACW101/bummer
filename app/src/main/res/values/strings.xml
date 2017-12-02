@@ -95,5 +95,10 @@
     <string name="bottom_map">Map</string>
     <string name="hint">Say something</string>
     <string name="share">Share</string>
+
+    <string name="selected_bitmap">selected_bitmap</string>
+
+    <string name = "service_not_available">service_not_available</string>
+    <string name = "invalid_lat_long_used">invalid_lat_long_used</string>
     <string name="dbname_location">location</string>
 </resources>
