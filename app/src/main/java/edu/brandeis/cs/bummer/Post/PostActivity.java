@@ -347,7 +347,7 @@ public class PostActivity extends AppCompatActivity {
                             Toast.makeText(getApplicationContext(), "Image Uploaded Successfully ", Toast.LENGTH_LONG).show();
 
                             //Get location file path
-                            String loc_path = toLatLonBin(location_pri.getLatitude(), location_pri.getAltitude());
+                            String loc_path = toLatLonBin(location_pri.getLatitude(), location_pri.getLongitude());
                             Log.e(TAG, "onSuccess: " + loc_path);
 
                             @SuppressWarnings("VisibleForTests")
@@ -427,11 +427,14 @@ public class PostActivity extends AppCompatActivity {
                     ImageUploadInfo imageUploadInfo = new ImageUploadInfo(TempImageName, taskSnapshot.getDownloadUrl().toString());
 
                     // Getting image upload ID.
-                    String ImageUploadId = databaseReference.child(loc_path).push().getKey();
+                    //String ImageUploadId = databaseReference.child(loc_path).push().getKey();
 
+
+
+                    databaseReference.child(loc_path).push().setValue(imageUploadInfo);
                     // Adding image upload id s child element into databaseReference.
-                    databaseReference.child(loc_path)
-                            .child(ImageUploadId).setValue(imageUploadInfo);
+                    /*databaseReference.child(loc_path)
+                            .child(ImageUploadId).setValue(imageUploadInfo);*/
 
                     /*//navigate to the main feed so the user can see their photo
                     Intent intent = new Intent(mContext, MainActivity.class);

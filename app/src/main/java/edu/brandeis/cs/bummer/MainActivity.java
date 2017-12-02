@@ -97,6 +97,9 @@ public class MainActivity extends FragmentActivity implements OnMapReadyCallback
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         mAuth = FirebaseAuth.getInstance();
+        //
+        //mAuth.signOut();
+        //
         mSearchText = (AutoCompleteTextView)findViewById(R.id.input_search);
         mGps = (ImageView)findViewById(R.id.ic_gps);
 
