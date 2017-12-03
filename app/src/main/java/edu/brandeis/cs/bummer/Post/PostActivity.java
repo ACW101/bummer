@@ -256,10 +256,11 @@ public class PostActivity extends AppCompatActivity {
             Log.d(TAG, "onActivityResult: attempting to navigate to final share screen.");
 
 
-            bitmap = (Bitmap) data.getExtras().get("data");
+
 
 
             try{
+                bitmap = (Bitmap) data.getExtras().get("data");
                 Log.d(TAG, "onActivityResult: received new bitmap from camera: " + bitmap);
                 // Setting up bitmap selected image into ImageView.
                 SelectImage.setImageBitmap(bitmap);
