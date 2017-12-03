@@ -7,6 +7,7 @@ import android.support.annotation.NonNull;
 import android.util.Log;
 import android.widget.Toast;
 
+import com.google.android.gms.maps.model.LatLng;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
@@ -27,8 +28,8 @@ import edu.brandeis.cs.bummer.Models.PostData;
 public class MapDataHelper {
     private static final String TAG = "MapDataHelper";
     private Context mContext;
-    private double lat, lon;
-    private String latLonBinName;
+    private LatLng location;
+    private String[] latLonBinNames;
     private LocationData locationData;
 
     // firebase stuff
@@ -46,10 +47,26 @@ public class MapDataHelper {
 
     public void updateLocation(double lat, double lon) {
         Log.d(TAG, "updateLatLon: lat=" + lat + " lon=" + lon );
-        this.lat = lat;
-        this.lon = lon;
-        this.latLonBinName = toLatLonBin(lat, lon);
-        Log.d(TAG, "binname: " + this.latLonBinName);
+        // change too small, don't update
+        if (this.location != null &&
+            Math.abs(this.location.latitude - lat) < 0.0002 &&
+            Math.abs(this.location.longitude - lon) < 0.0002) {
+            return;
+        }
+        
+        this.location = new LatLng(lat, lon);
+        Log.d(TAG, "updateLocation: create new binnames");
+        latLonBinNames = new String[]{
+                toLatLonBin(lat - 0.0001, lon - 0.0001),
+                toLatLonBin(lat - 0.0001, lon),
+                toLatLonBin(lat - 0.0001, lon + 0.0001),
+                toLatLonBin(lat, lon - 0.0001),
+                toLatLonBin(lat, lon),
+                toLatLonBin(lat, lon + 0.0001),
+                toLatLonBin(lat + 0.0001, lon - 0.0001),
+                toLatLonBin(lat + 0.0001, lon),
+                toLatLonBin(lat + 0.0001, lon + 0.0001)
+        };
 
         Log.d(TAG, "updateLocation: getting new data");
         getMapData();
@@ -78,9 +95,9 @@ public class MapDataHelper {
             public void onDataChange(DataSnapshot dataSnapshot) {
                 Log.d(TAG, "onDataChange: data change");
                 // get the photos from lonLatBinName
-                if (latLonBinName != null) {
-                    Log.d(TAG, "onDataChange: getting location data from firebase" +  latLonBinName);
-                    locationData = mFirebaseHelper.getLocationData(dataSnapshot, latLonBinName);
+                if (latLonBinNames != null) {
+                    Log.d(TAG, "onDataChange: getting location data from firebase");
+                    locationData = mFirebaseHelper.getLocationData(dataSnapshot, location, latLonBinNames);
                     MainActivity ma = (MainActivity) mContext;
                     ma.updateMarker(locationData);
                 }

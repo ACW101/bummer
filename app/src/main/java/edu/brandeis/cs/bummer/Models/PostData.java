@@ -6,7 +6,7 @@ package edu.brandeis.cs.bummer.Models;
 
 public class PostData {
     private String imageURL;
-
+    // TODO: get the thumbnail version of image doing string manipulation
     public PostData(String imageURL) {
 
         this.imageURL = imageURL;

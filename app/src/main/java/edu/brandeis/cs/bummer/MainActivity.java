@@ -1,24 +1,21 @@
 package edu.brandeis.cs.bummer;
 
 import android.Manifest;
-import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentSender;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.location.Address;
 import android.location.Geocoder;
 import android.location.Location;
-import android.net.ConnectivityManager;
+import android.net.Uri;
 import android.os.Bundle;
-import android.os.Looper;
-import android.os.StrictMode;
+import android.provider.Settings;
 import android.support.annotation.NonNull;
+import android.support.design.widget.Snackbar;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.FragmentActivity;
-import android.support.v4.content.ContextCompat;
 import android.util.Log;
 import android.view.KeyEvent;
 import android.view.Menu;
@@ -33,12 +30,10 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
-import com.bumptech.glide.request.FutureTarget;
 import com.bumptech.glide.request.target.SimpleTarget;
 import com.bumptech.glide.request.transition.Transition;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.ApiException;
-import com.google.android.gms.common.api.CommonStatusCodes;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.common.api.ResolvableApiException;
 import com.google.android.gms.location.FusedLocationProviderClient;
@@ -72,7 +67,6 @@ import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
-import com.google.firebase.database.Logger;
 import com.ittianyu.bottomnavigationviewex.BottomNavigationViewEx;
 
 import java.io.IOException;
@@ -80,8 +74,6 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.FutureTask;
 
 import edu.brandeis.cs.bummer.Auth.SigninActivity;
 import edu.brandeis.cs.bummer.Models.PostData;
@@ -94,18 +86,15 @@ import edu.brandeis.cs.bummer.Utils.models.PlaceInfo;
 public class MainActivity extends FragmentActivity implements OnMapReadyCallback,
         GoogleApiClient.OnConnectionFailedListener{
 
+    private static final int REQUEST_PERMISSIONS_REQUEST_CODE = 30;
+
     @Override
     public void onConnectionFailed(@NonNull ConnectionResult connectionResult) {
 
     }
     private static final String TAG = "MainActivity";
     private static final int ACTIVITY_NUM = 0;
-    private static final String Fine_Location = Manifest.permission.ACCESS_FINE_LOCATION;
-    private static final String Coarse_Location = Manifest.permission.ACCESS_COARSE_LOCATION;
-    private static final int Location_Permission_Request_Code = 1234;
     private static final float DEFAULT_ZOOM = 15f;
-    private static final double CURRENT_LATTITUTE = 42.3669;
-    private static final double CURRENT_LONGTITUTE = -71.2583;
     private static final LatLngBounds LAT_LNG_BOUNDS = new LatLngBounds(
             new LatLng(-40, -168), new LatLng(71, 168));
 
@@ -118,6 +107,7 @@ public class MainActivity extends FragmentActivity implements OnMapReadyCallback
     private FirebaseAuth.AuthStateListener mAuthListener;
 
     private FirebaseUser currentUser;
+    // TODO: persist mLocationPermissionGranted
     private Boolean mLocationPermissionGranted = false;
     private GoogleMap mMap;
     private FusedLocationProviderClient mFusedLocationClient;
@@ -130,11 +120,9 @@ public class MainActivity extends FragmentActivity implements OnMapReadyCallback
     private MapDataHelper mapDataHelper;
 
     // google map
-    ArrayList<Marker> markerList = new ArrayList<>();
     private LocationRequest mLocationRequest;
     private LocationSettingsRequest mLocationSettingsRequest;
     private static final int REQUEST_CHECK_SETTINGS = 1;
-    // TODO: check permission
     private boolean mRequestingLocationUpdates;
     private LocationCallback mLocationCallback;
     private Location mCurrentLocation;
@@ -181,21 +169,23 @@ public class MainActivity extends FragmentActivity implements OnMapReadyCallback
         createLocationRequest();
         // build location request
         buildLocationSetting();
-        // check permission and start map if permission granted
-        startLocationUpdates();
 
         // reset UI on bottom nav bar
         setupBottomNavigationView();
 
-        //mAuth.signOut();
+//        mAuth.signOut();
     }
 
     @Override
     protected void onResume() {
         super.onResume();
-        if (mRequestingLocationUpdates) {
-            Log.d(TAG, "onResume: starting location updates");
+        Log.d(TAG, "onResume: onResume");
+        if (checkPermissions()) {
+            Log.d(TAG, "onResume: valid permission, start location update");
             startLocationUpdates();
+        } else {
+            Log.d(TAG, "onResume: ");
+            requestPermissions();
         }
     }
 
@@ -204,10 +194,6 @@ public class MainActivity extends FragmentActivity implements OnMapReadyCallback
         mAuth.removeAuthStateListener(mAuthListener);
         super.onDestroy();
     }
-
-
-
-
 
 //    private boolean isNetworkConnected() {
 //        ConnectivityManager cm = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
@@ -517,12 +503,105 @@ public class MainActivity extends FragmentActivity implements OnMapReadyCallback
     public void onMapReady(GoogleMap googleMap) {
         Toast.makeText(this, "Map is ready", Toast.LENGTH_SHORT).show();
         Log.d(TAG, "onMapReady: map is ready");
+
         mMap = googleMap;
         initSearchBar();
 
         // map properties
         mMap.setMyLocationEnabled(true);
         mMap.getUiSettings().setMyLocationButtonEnabled(false);
+    }
+
+    private boolean checkPermissions() {
+        Log.d(TAG, "checkPermissions: checking permission");
+        int permissionState = ActivityCompat.checkSelfPermission(this,
+                Manifest.permission.ACCESS_FINE_LOCATION);
+        return permissionState == PackageManager.PERMISSION_GRANTED;
+    }
+
+    private void requestPermissions() {
+        Log.d(TAG, "requestPermissions: requesting permission");
+        boolean shouldProvideRationale =
+                ActivityCompat.shouldShowRequestPermissionRationale(this,
+                        Manifest.permission.ACCESS_FINE_LOCATION);
+
+        // Provide an additional rationale to the user. This would happen if the user denied the
+        // request previously, but didn't check the "Don't ask again" checkbox.
+        if (shouldProvideRationale) {
+            Log.i(TAG, "Displaying permission rationale to provide additional context.");
+            showSnackbar(R.string.permission_rationale,
+                    android.R.string.ok, new View.OnClickListener() {
+                        @Override
+                        public void onClick(View view) {
+                            // Request permission
+                            ActivityCompat.requestPermissions(MainActivity.this,
+                                    new String[]{Manifest.permission.ACCESS_FINE_LOCATION},
+                                    REQUEST_PERMISSIONS_REQUEST_CODE);
+                        }
+                    });
+        } else {
+            Log.i(TAG, "Requesting permission");
+            // Request permission. It's possible this can be auto answered if device policy
+            // sets the permission in a given state or the user denied the permission
+            // previously and checked "Never ask again".
+            ActivityCompat.requestPermissions(MainActivity.this,
+                    new String[]{Manifest.permission.ACCESS_FINE_LOCATION},
+                    REQUEST_PERMISSIONS_REQUEST_CODE);
+        }
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions,
+                                           @NonNull int[] grantResults) {
+        Log.i(TAG, "onRequestPermissionResult");
+        if (requestCode == REQUEST_PERMISSIONS_REQUEST_CODE) {
+            if (grantResults.length <= 0) {
+                // If user interaction was interrupted, the permission request is cancelled and you
+                // receive empty arrays.
+                Log.i(TAG, "User interaction was cancelled.");
+            } else if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                if (mRequestingLocationUpdates) {
+                    Log.i(TAG, "Permission granted, updates requested, starting location updates");
+                    startLocationUpdates();
+                }
+            } else {
+                // Permission denied.
+
+                // Notify the user via a SnackBar that they have rejected a core permission for the
+                // app, which makes the Activity useless. In a real app, core permissions would
+                // typically be best requested during a welcome-screen flow.
+
+                // Additionally, it is important to remember that a permission might have been
+                // rejected without asking the user for permission (device policy or "Never ask
+                // again" prompts). Therefore, a user interface affordance is typically implemented
+                // when permissions are denied. Otherwise, your app could appear unresponsive to
+                // touches or interactions which have required permissions.
+                showSnackbar(R.string.permission_denied_explanation,
+                        android.R.string.no, new View.OnClickListener() {
+                            @Override
+                            public void onClick(View view) {
+                                // Build intent that displays the App settings screen.
+                                Intent intent = new Intent();
+                                intent.setAction(
+                                        Settings.ACTION_APPLICATION_DETAILS_SETTINGS);
+                                Uri uri = Uri.fromParts("package",
+                                        BuildConfig.APPLICATION_ID, null);
+                                intent.setData(uri);
+                                intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                                startActivity(intent);
+                            }
+                        });
+            }
+        }
+    }
+
+    private void showSnackbar(final int mainTextStringId, final int actionStringId,
+                              View.OnClickListener listener) {
+        Snackbar.make(
+                findViewById(android.R.id.content),
+                getString(mainTextStringId),
+                Snackbar.LENGTH_INDEFINITE)
+                .setAction(getString(actionStringId), listener).show();
     }
 
     /* =========================================== end request location methods =========================================== */
