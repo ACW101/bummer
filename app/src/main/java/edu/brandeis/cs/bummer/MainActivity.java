@@ -135,6 +135,7 @@ public class MainActivity extends FragmentActivity implements OnMapReadyCallback
 
         // listen for auth change and start signin activity if needed
         mAuth = FirebaseAuth.getInstance();
+//        mAuth.signOut();
 
         mAuthListener = new FirebaseAuth.AuthStateListener() {
             @Override
@@ -385,9 +386,12 @@ public class MainActivity extends FragmentActivity implements OnMapReadyCallback
             final Marker mk = mMap.addMarker(new MarkerOptions()
                     .position(markerLocations[i]));
             mk.setTag(i);
+
             // load image with Glide
             try {
-                URL url = new URL(post.getImageURL());
+                String thumbURL = PostData.toThumbURL(post.getImageURL());
+                Log.d(TAG, "updateMarker: translate to thumbURL");
+                URL url = new URL(thumbURL);
                 Glide.with(mContext).asBitmap().load(url).into(new SimpleTarget<Bitmap>() {
                     @Override
                     public void onResourceReady(Bitmap resource, Transition<? super Bitmap> transition) {

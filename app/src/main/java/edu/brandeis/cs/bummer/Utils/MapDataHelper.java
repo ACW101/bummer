@@ -47,12 +47,6 @@ public class MapDataHelper {
 
     public void updateLocation(double lat, double lon) {
         Log.d(TAG, "updateLatLon: lat=" + lat + " lon=" + lon );
-        // change too small, don't update
-        if (this.location != null &&
-            Math.abs(this.location.latitude - lat) < 0.0002 &&
-            Math.abs(this.location.longitude - lon) < 0.0002) {
-            return;
-        }
         
         this.location = new LatLng(lat, lon);
         Log.d(TAG, "updateLocation: create new binnames");
@@ -102,7 +96,6 @@ public class MapDataHelper {
                     ma.updateMarker(locationData);
                 }
             }
-
 
             @Override
             public void onCancelled(DatabaseError databaseError) {
