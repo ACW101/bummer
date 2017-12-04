@@ -59,6 +59,37 @@
         android:id="@+id/ic_gps"
         android:src="@drawable/ic_gps"/>
 
+
+    <ImageView
+        android:layout_width="40dp"
+        android:layout_height="40dp"
+        android:layout_below="@id/ic_gps"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentEnd="true"
+        android:layout_marginRight="10dp"
+        android:layout_marginEnd="10dp"
+        android:layout_marginTop="10dp"
+        android:scaleType="centerCrop"
+        android:id="@+id/ic_show"
+        android:src="@drawable/ic_show"
+        android:onClick="ShowMarker"/>
+
+    <ImageView
+        android:layout_width="40dp"
+        android:layout_height="40dp"
+        android:layout_below="@id/ic_show"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentEnd="true"
+        android:layout_marginRight="10dp"
+        android:layout_marginEnd="10dp"
+        android:layout_marginTop="10dp"
+        android:scaleType="centerCrop"
+        android:id="@+id/ic_hide"
+        android:src="@drawable/ic_cancel"
+        android:onClick="HideMarker"/>
+
+
+
     <include layout="@layout/bottom_navi_bar"/>
 </RelativeLayout>
 

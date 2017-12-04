@@ -5,10 +5,9 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.location.Address;
 import android.location.Geocoder;
-import android.net.ConnectivityManager;
+import android.location.Location;
 import android.os.Bundle;
 import android.os.StrictMode;
 import android.support.annotation.NonNull;
@@ -83,7 +82,7 @@ public class MainActivity extends FragmentActivity implements OnMapReadyCallback
     private static final String Fine_Location = Manifest.permission.ACCESS_FINE_LOCATION;
     private static final String Coarse_Location = Manifest.permission.ACCESS_COARSE_LOCATION;
     private static final int Location_Permission_Request_Code = 1234;
-    private static final float DEFAULT_ZOOM = 15f;
+    private static final float DEFAULT_ZOOM = 16f;
     private static final double CURRENT_LATTITUTE = 42.3669;
     private static final double CURRENT_LONGTITUTE = -71.2583;
     private static final LatLngBounds LAT_LNG_BOUNDS = new LatLngBounds(
@@ -92,6 +91,8 @@ public class MainActivity extends FragmentActivity implements OnMapReadyCallback
     //widgets
     private AutoCompleteTextView mSearchText;
     private ImageView mGps;
+    private ImageView mShow;
+    private ImageView mHide;
 
     private FirebaseUser currentUser;
     private Boolean mLocationPermissionGranted = false;
@@ -102,6 +103,7 @@ public class MainActivity extends FragmentActivity implements OnMapReadyCallback
     private PlaceDetectionClient mPlaceDetectionClient;
     private PlaceInfo mPlace;
     private Marker myMarker;
+    private String intentLocation = "";
 
     // [START declare_auth]
     private FirebaseAuth mAuth;
@@ -123,10 +125,15 @@ public class MainActivity extends FragmentActivity implements OnMapReadyCallback
         mAuth = FirebaseAuth.getInstance();
         mSearchText = (AutoCompleteTextView)findViewById(R.id.input_search);
         mGps = (ImageView)findViewById(R.id.ic_gps);
+        mHide = (ImageView)findViewById(R.id.ic_hide);
+        mShow = (ImageView)findViewById(R.id.ic_show);
+//        mAuth.signOut();
+
         getLocationPermission();
 
         // Buttons
         setupBottomNavigationView();
+
     }
 
     @Override
@@ -158,53 +165,46 @@ public class MainActivity extends FragmentActivity implements OnMapReadyCallback
             }
             mMap.setMyLocationEnabled(true);
             mMap.getUiSettings().setMyLocationButtonEnabled(false);
+            mMap.getUiSettings().setZoomControlsEnabled(false);
+            mMap.setMaxZoomPreference(DEFAULT_ZOOM);
+            mMap.setMinZoomPreference(DEFAULT_ZOOM);
             init();
 
         }
     }
 
-    private boolean isNetworkConnected() {
-        ConnectivityManager cm = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
-        mMap.setOnMarkerClickListener(new GoogleMap.OnMarkerClickListener() {
-
-            public boolean onMarkerClick(final Marker marker) {
-
-                if (marker.equals(myMarker)) {
-                 Toast.makeText(MainActivity.this, "Marker is clicked", Toast.LENGTH_SHORT).show();
-                    Intent intent = new Intent(MainActivity.this, InfoActivity.class);
-                    startActivity(intent);
-                }
-                return true;
-            }
-        });
-
-        try {
-            URL url = new URL("https://firebasestorage.googleapis.com/v0/b/bummer-ec3a6.appspot.com/o/100%2Fthumb_puppy-1.jpg?alt=media&token=eb0166b6-6537-4f0a-89b7-a8dcf134f107");
-            Bitmap bmp = BitmapFactory.decodeStream(url.openConnection().getInputStream());
-            myMarker = mMap.addMarker(new MarkerOptions()
-                    .icon(BitmapDescriptorFactory.fromBitmap(bmp))
-                    .anchor(0.0f, 1.0f) // Anchors the marker on the bottom left
-                    .position(new LatLng(42.366998, -71.258864)));
-
-
-        } catch (MalformedURLException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        return (cm.getActiveNetworkInfo() != null);
-    }
-
-    public boolean onMarkerClick(final Marker marker) {
-
-        if (marker.equals(myMarker))
-        {
-            Toast.makeText(this, "Marker is clicked", Toast.LENGTH_SHORT).show();
-            Intent intent = new Intent(this, InfoActivity.class);
-            startActivity(intent);
-        }
-        return true;
-    }
+//    private boolean isNetworkConnected() {
+//        ConnectivityManager cm = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
+//        mMap.setOnMarkerClickListener(new GoogleMap.OnMarkerClickListener() {
+//
+//
+//            public boolean onMarkerClick(final Marker marker) {
+//
+//                if (marker.equals(myMarker)) {
+//                 Toast.makeText(MainActivity.this, "Marker is clicked", Toast.LENGTH_SHORT).show();
+//                    Intent intent = new Intent(MainActivity.this, InfoActivity.class);
+//                    startActivity(intent);
+//                }
+//                return true;
+//            }
+//        });
+//
+//        try {
+//            URL url = new URL("https://firebasestorage.googleapis.com/v0/b/bummer-ec3a6.appspot.com/o/100%2Fthumb_puppy-1.jpg?alt=media&token=eb0166b6-6537-4f0a-89b7-a8dcf134f107");
+//            Bitmap bmp = BitmapFactory.decodeStream(url.openConnection().getInputStream());
+//            myMarker = mMap.addMarker(new MarkerOptions()
+//                    .icon(BitmapDescriptorFactory.fromBitmap(bmp))
+//                    .anchor(0.0f, 1.0f) // Anchors the marker on the bottom left
+//                    .position(new LatLng(42.366998, -71.258864)));
+//
+//
+//        } catch (MalformedURLException e) {
+//            e.printStackTrace();
+//        } catch (IOException e) {
+//            e.printStackTrace();
+//        }
+//        return cm.getActiveNetworkInfo() != null;
+//    }
 
 
     public void init(){
@@ -284,10 +284,20 @@ public class MainActivity extends FragmentActivity implements OnMapReadyCallback
                      public void onComplete(@NonNull Task task) {
                          if (task.isSuccessful()) {
                              Log.d(TAG, "onComplete: found location");
-//                             Location currentLocation = (Location)task.getResult();
-                             moveCamera(new LatLng(CURRENT_LATTITUTE, CURRENT_LONGTITUTE),
-                                     DEFAULT_ZOOM, "My Location");
+                             Location currentLocation = (Location)task.getResult();
 
+                             if (currentLocation == null){
+                                 Log.d(TAG, "onComplete: null "+ CURRENT_LATTITUTE);
+                                 moveCamera(new LatLng(CURRENT_LATTITUTE, CURRENT_LONGTITUTE),
+                                         DEFAULT_ZOOM, "My Location");
+
+                             } else {
+                                 intentLocation = currentLocation.getLatitude()+ "*" + currentLocation.getLongitude();
+                                 Log.d(TAG, "onComplete: "+ currentLocation.getLatitude() + " " + currentLocation.getLongitude());
+                                 moveCamera(new LatLng(currentLocation.getLatitude(), currentLocation.getLongitude()),
+                                         DEFAULT_ZOOM, "My Location");
+
+                             }
                              // get image informations
                              mapDataHelper = new MapDataHelper(mContext, CURRENT_LATTITUTE, CURRENT_LONGTITUTE);
 
@@ -316,6 +326,18 @@ public class MainActivity extends FragmentActivity implements OnMapReadyCallback
          }
             hideSoftKeyboard();
      }
+
+    public void HideMarker(View view) {
+        markerList.get(0).setVisible(false);
+        moveCamera(new LatLng(CURRENT_LATTITUTE, CURRENT_LONGTITUTE),
+                DEFAULT_ZOOM, "My Location");
+    }
+
+    public void ShowMarker(View view) {
+        markerList.get(0).setVisible(true);
+        moveCamera(new LatLng(CURRENT_LATTITUTE, CURRENT_LONGTITUTE),
+                DEFAULT_ZOOM, "My Location");
+    }
 
      private void initMap(){
          // Obtain the SupportMapFragment and get notified when the map is ready to be used.
@@ -434,16 +456,18 @@ public class MainActivity extends FragmentActivity implements OnMapReadyCallback
         }
     };
 
+
     public void updateMarker(LocationData locationData) {
-         markerList = new ArrayList<>();
+        markerList = new ArrayList<Marker>();
         int markerNum = 0;
         Log.d(TAG, "updating marker");
         for (PostData post : locationData.getPosts()) {
             Log.d(TAG, post.getImageURL());
             final Marker mk = mMap.addMarker(new MarkerOptions()
                     .anchor(0.0f, 1.0f) // Anchors the marker on the bottom left
-                    .position(new LatLng(CURRENT_LATTITUTE , CURRENT_LONGTITUTE + markerNum * 0.005 - 0.01)));
+                    .position(new LatLng(CURRENT_LATTITUTE, CURRENT_LONGTITUTE + markerNum * 0.005 - 0.01)));
             mk.setTag(markerNum);
+//            ArrayList<Marker> markerList = new ArrayList<Marker>();
             markerList.add(mk);
             try {
                 URL url = new URL(post.getImageURL());
@@ -459,21 +483,21 @@ public class MainActivity extends FragmentActivity implements OnMapReadyCallback
             }
             mMap.setOnMarkerClickListener(new GoogleMap.OnMarkerClickListener() {
                 public boolean onMarkerClick(final Marker marker) {
-                    Toast.makeText(MainActivity.this, "Marker "  + marker.getTag() + "is clicked", Toast.LENGTH_SHORT).show();
-//                        Intent intent = new Intent(MainActivity.this, InfoActivity.class);
-//                        startActivity(intent);
+                    Toast.makeText(MainActivity.this, "Marker " + marker.getTag() + "is clicked", Toast.LENGTH_SHORT).show();
+                    Intent intent = new Intent(MainActivity.this, InfoActivity.class);
+//                    intent.putExtra("MakerURL", post.getImageURL());
+                    setResult(RESULT_OK, intent);
+                    startActivity(intent);
                     return true;
                 }
             });
 
+
             markerNum++;
+
         }
-    }
-
-
-    @Override
-    protected void onDestroy() {
-        super.onDestroy();
 
     }
+
+
 }
