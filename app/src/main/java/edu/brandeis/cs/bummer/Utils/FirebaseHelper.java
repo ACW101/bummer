@@ -4,6 +4,7 @@ import android.content.Context;
 import android.util.Log;
 import android.widget.Toast;
 
+import com.google.android.gms.maps.model.LatLng;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseReference;
@@ -72,18 +73,26 @@ public class FirebaseHelper {
         return user;
     }
 
-    public LocationData getLocationData(DataSnapshot data, String location) {
+    public LocationData getLocationData(DataSnapshot data, LatLng location, String[] binNames) {
         Log.d(TAG, "FirebaseHelper: getLocationData: getting location data from database");
         LocationData locationData = new LocationData(location);
 
         for (DataSnapshot ds : data.getChildren()) {
             if (ds.getKey().equals(mContext.getString(R.string.dbname_location))) {
-                Log.d(TAG, "FirebaseHelper: getUserInfo, getting userData");
-                DataSnapshot locationDataSnapshot = ds.child(location);
-                if (locationDataSnapshot.exists()) {
-                    for (DataSnapshot childs : locationDataSnapshot.getChildren()) {
-                        Log.d(TAG, "FirebaseHelper: getLocationData: getting PostData");
-                        locationData.append(childs.getValue(PostData.class));
+                for (String binName : binNames) {
+                    Log.d(TAG, "getLocationData: Getting bin " + binName);
+                    DataSnapshot locationDataSnapshot = ds.child(binName);
+
+                    if (locationDataSnapshot.exists()) {
+                        Log.d(TAG, "getLocationData: Bin " + binName + " exists");
+                        int counter = 1;
+                        for (DataSnapshot childs : locationDataSnapshot.getChildren()) {
+                            Log.d(TAG, "FirebaseHelper: getLocationData: getting PostData " + counter);
+                            locationData.append(childs.getValue(PostData.class));
+                            counter++;
+                        }
+                    } else {
+                        Log.d(TAG, "getLocationData: Bin " + binName + " doesn't exists");
                     }
                 }
             }

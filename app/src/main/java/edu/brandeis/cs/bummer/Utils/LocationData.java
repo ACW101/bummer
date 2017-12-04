@@ -1,5 +1,7 @@
 package edu.brandeis.cs.bummer.Utils;
 
+import com.google.android.gms.maps.model.LatLng;
+
 import java.util.ArrayList;
 
 import edu.brandeis.cs.bummer.Models.PostData;
@@ -9,10 +11,10 @@ import edu.brandeis.cs.bummer.Models.PostData;
  */
 
 public class LocationData {
-    private String location;
+    private LatLng location;
     private ArrayList<PostData> posts = new ArrayList<>();
 
-    public LocationData(String location) {
+    public LocationData(LatLng location) {
         this.location = location;
     }
 

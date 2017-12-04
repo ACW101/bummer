@@ -101,4 +101,6 @@
     <string name = "service_not_available">service_not_available</string>
     <string name = "invalid_lat_long_used">invalid_lat_long_used</string>
     <string name="dbname_location">location</string>
+    <string name="permission_rationale">Bummer is a location aware app and we display photo based on your location.</string>
+    <string name="permission_denied_explanation">Since you decide to not give us permission, you will not be enjoying the full functionality of the app.</string>
 </resources>
