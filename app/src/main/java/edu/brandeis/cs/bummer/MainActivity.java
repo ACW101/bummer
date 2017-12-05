@@ -25,6 +25,7 @@ import android.view.WindowManager;
 import android.view.inputmethod.EditorInfo;
 import android.widget.AdapterView;
 import android.widget.AutoCompleteTextView;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -103,6 +104,7 @@ public class MainActivity extends FragmentActivity implements OnMapReadyCallback
     //widgets
     private AutoCompleteTextView mSearchText;
     private ImageView mGps;
+    private Button mSignOut;
 
     // firebase
     private FirebaseAuth mAuth;
@@ -137,6 +139,7 @@ public class MainActivity extends FragmentActivity implements OnMapReadyCallback
 
         // listen for auth change and start signin activity if needed
         mAuth = FirebaseAuth.getInstance();
+
 //        mAuth.signOut();
 
         mAuthListener = new FirebaseAuth.AuthStateListener() {
@@ -163,6 +166,17 @@ public class MainActivity extends FragmentActivity implements OnMapReadyCallback
         // UI references
         mSearchText = (AutoCompleteTextView) findViewById(R.id.input_search);
         mGps = (ImageView) findViewById(R.id.ic_gps);
+        mSignOut = (Button)findViewById(R.id.signout_btn);
+
+        mSignOut.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Log.d(TAG, "onClick: sign out");
+                mAuth.signOut();
+            }
+        });
+
+
 
         // init Clients
         mSettingsClient = LocationServices.getSettingsClient(this);
@@ -378,11 +392,11 @@ public class MainActivity extends FragmentActivity implements OnMapReadyCallback
                 new LatLng(lat, lng - 0.005)
         };
         // get latest post
-        List<PostData> posts = locationData.getPosts();
+        final List<PostData> posts = locationData.getPosts();
 
         // set at most 4 markers and set icon as photos
         for (int i = 0; i < posts.size() && i < 4; i++) {
-            final PostData post = posts.get(i);
+            PostData post = posts.get(i);
             final Marker mk = mMap.addMarker(new MarkerOptions()
                     .position(markerLocations[i]));
             mk.setTag(i);
@@ -407,8 +421,9 @@ public class MainActivity extends FragmentActivity implements OnMapReadyCallback
                 public boolean onMarkerClick(final Marker marker) {
                     Toast.makeText(MainActivity.this, "Marker " + marker.getTag() + "is clicked", Toast.LENGTH_SHORT).show();
                         Intent intent = new Intent(MainActivity.this, InfoActivity.class);
-                        intent.putExtra("MarkerURL", post.getImageURL());
-                        setResult(RESULT_OK, intent);
+                        int MarkerNum = (int) marker.getTag();
+                        PostData myPost = posts.get(MarkerNum);
+                        intent.putExtra("MarkerURL", myPost.getImageURL());
                         startActivity(intent);
                     return true;
                 }
