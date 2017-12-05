@@ -76,6 +76,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import edu.brandeis.cs.bummer.Auth.SigninActivity;
+import edu.brandeis.cs.bummer.Details.InfoActivity;
 import edu.brandeis.cs.bummer.Models.PostData;
 import edu.brandeis.cs.bummer.Utils.BottomNavigationHelper;
 import edu.brandeis.cs.bummer.Utils.LocationData;
@@ -378,7 +379,7 @@ public class MainActivity extends FragmentActivity implements OnMapReadyCallback
                 new LatLng(lat, lng - 0.005)
         };
         // get latest post
-        List<PostData> posts = locationData.getPosts();
+        final List<PostData> posts = locationData.getPosts();
 
         // set at most 4 markers and set icon as photos
         for (int i = 0; i < posts.size() && i < 4; i++) {
@@ -405,9 +406,15 @@ public class MainActivity extends FragmentActivity implements OnMapReadyCallback
             // start activity when marker clicked
             mMap.setOnMarkerClickListener(new GoogleMap.OnMarkerClickListener() {
                 public boolean onMarkerClick(final Marker marker) {
-                    Toast.makeText(MainActivity.this, "Marker "  + marker.getTag() + "is clicked", Toast.LENGTH_SHORT).show();
-//                        Intent intent = new Intent(MainActivity.this, InfoActivity.class);
-//                        startActivity(intent);
+                    Toast.makeText(MainActivity.this, "Marker " + marker.getTag() + "is clicked", Toast.LENGTH_SHORT).show();
+                                            Intent intent = new Intent(MainActivity.this, InfoActivity.class);
+                                            int MarkerNum = (int) marker.getTag();
+                                            PostData myPost = posts.get(MarkerNum);
+                                            String[] data = new String[2];
+                                            data[0] = myPost.getImageURL();
+                                            data[1] = myPost.getImageName();
+                                            intent.putExtra("MarkerURL",data);
+                                            startActivity(intent);
                     return true;
                 }
             });

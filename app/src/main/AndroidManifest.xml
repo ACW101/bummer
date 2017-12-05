@@ -40,7 +40,7 @@
             android:name=".Profile.ProfileActivity"
             android:windowSoftInputMode="adjustResize"></activity>
         <activity android:name=".Auth.EmailVerificationActivity"></activity>
-
+        <activity android:name=".Details.InfoActivity"></activity>
         <meta-data
             android:name="com.google.android.geo.API_KEY"
             android:value="AIzaSyBJUbJZxdNEAkb_3brnA6exQu0WlD3l5sE" />
