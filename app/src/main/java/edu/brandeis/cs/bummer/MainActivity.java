@@ -76,6 +76,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import edu.brandeis.cs.bummer.Auth.SigninActivity;
+import edu.brandeis.cs.bummer.Details.InfoActivity;
 import edu.brandeis.cs.bummer.Models.PostData;
 import edu.brandeis.cs.bummer.Utils.BottomNavigationHelper;
 import edu.brandeis.cs.bummer.Utils.LocationData;
@@ -84,7 +85,7 @@ import edu.brandeis.cs.bummer.Utils.models.PlaceInfo;
 
 
 public class MainActivity extends FragmentActivity implements OnMapReadyCallback,
-        GoogleApiClient.OnConnectionFailedListener{
+        GoogleApiClient.OnConnectionFailedListener {
 
     private static final int REQUEST_PERMISSIONS_REQUEST_CODE = 30;
 
@@ -92,6 +93,7 @@ public class MainActivity extends FragmentActivity implements OnMapReadyCallback
     public void onConnectionFailed(@NonNull ConnectionResult connectionResult) {
 
     }
+
     private static final String TAG = "MainActivity";
     private static final int ACTIVITY_NUM = 0;
     private static final float DEFAULT_ZOOM = 15f;
@@ -159,8 +161,8 @@ public class MainActivity extends FragmentActivity implements OnMapReadyCallback
         mapDataHelper = new MapDataHelper(mContext);
 
         // UI references
-        mSearchText = (AutoCompleteTextView)findViewById(R.id.input_search);
-        mGps = (ImageView)findViewById(R.id.ic_gps);
+        mSearchText = (AutoCompleteTextView) findViewById(R.id.input_search);
+        mGps = (ImageView) findViewById(R.id.ic_gps);
 
         // init Clients
         mSettingsClient = LocationServices.getSettingsClient(this);
@@ -203,7 +205,7 @@ public class MainActivity extends FragmentActivity implements OnMapReadyCallback
 //    }
 
 
-    private void initSearchBar(){
+    private void initSearchBar() {
         Log.d(TAG, "initSearchBar: initializing");
         mGeoDataClient = Places.getGeoDataClient(this, null);
         mPlaceDetectionClient = Places.getPlaceDetectionClient(this, null);
@@ -218,10 +220,10 @@ public class MainActivity extends FragmentActivity implements OnMapReadyCallback
         mSearchText.setOnEditorActionListener(new TextView.OnEditorActionListener() {
             @Override
             public boolean onEditorAction(TextView textView, int actionId, KeyEvent keyEvent) {
-                if(actionId == EditorInfo.IME_ACTION_SEARCH
+                if (actionId == EditorInfo.IME_ACTION_SEARCH
                         || actionId == EditorInfo.IME_ACTION_DONE
                         || keyEvent.getAction() == KeyEvent.ACTION_DOWN
-                        || keyEvent.getAction() == KeyEvent.KEYCODE_ENTER){
+                        || keyEvent.getAction() == KeyEvent.KEYCODE_ENTER) {
                     //execute our method for searching
                     geoLocate();
                 }
@@ -241,21 +243,21 @@ public class MainActivity extends FragmentActivity implements OnMapReadyCallback
         hideSoftKeyboard();
     }
 
-    public void geoLocate(){
+    public void geoLocate() {
         Log.d(TAG, "getDeviceLocation: getting the search location");
 
         String searchString = mSearchText.getText().toString();
 
         Geocoder geocoder = new Geocoder(MainActivity.this);
         List<Address> list = new ArrayList<>();
-        try{
+        try {
             list = geocoder.getFromLocationName(searchString, 1);
-        }catch (IOException e){
-            Log.e(TAG,"geoLocation: IOException: " + e.getMessage());
+        } catch (IOException e) {
+            Log.e(TAG, "geoLocation: IOException: " + e.getMessage());
 
         }
 
-        if(list.size() > 0){
+        if (list.size() > 0) {
             Address address = list.get(0);
 
             Log.d(TAG, "geoLocate: found a location: " + address.toString());
@@ -267,8 +269,8 @@ public class MainActivity extends FragmentActivity implements OnMapReadyCallback
     /*
         Reset camera to current location if available
      */
-    public void getDeviceLocation(){
-        Log.d(TAG,"getDeviceLocation: getting the devices current location");
+    public void getDeviceLocation() {
+        Log.d(TAG, "getDeviceLocation: getting the devices current location");
         if (mCurrentLocation == null) {
             Log.d(TAG, "getDeviceLocation: no current location");
         } else {
@@ -278,10 +280,10 @@ public class MainActivity extends FragmentActivity implements OnMapReadyCallback
         }
     }
 
-    public void moveCamera(LatLng latLng, float zoom, String title){
-        Log.d(TAG,"moveCamera: moving to: lat: " + latLng.latitude + ", lng: " + latLng.longitude);
+    public void moveCamera(LatLng latLng, float zoom, String title) {
+        Log.d(TAG, "moveCamera: moving to: lat: " + latLng.latitude + ", lng: " + latLng.longitude);
         mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(latLng, zoom));
-        if(!title.equals("My Location")) {
+        if (!title.equals("My Location")) {
             MarkerOptions options = new MarkerOptions()
                     .position(latLng)
                     .title(title);
@@ -290,7 +292,7 @@ public class MainActivity extends FragmentActivity implements OnMapReadyCallback
         hideSoftKeyboard();
     }
 
-    private void setupBottomNavigationView(){
+    private void setupBottomNavigationView() {
 
         BottomNavigationViewEx bottomNavigationViewEx = (BottomNavigationViewEx) findViewById(R.id.bottomNavViewBar);
 
@@ -302,18 +304,16 @@ public class MainActivity extends FragmentActivity implements OnMapReadyCallback
     }
 
 
-
-
-    private void hideSoftKeyboard(){
+    private void hideSoftKeyboard() {
         this.getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN);
     }
 
     /*
          --------------- google places API autocomplete suggestions ------------
      */
-    private AdapterView.OnItemClickListener mAutocompleteClickListener = new AdapterView.OnItemClickListener(){
+    private AdapterView.OnItemClickListener mAutocompleteClickListener = new AdapterView.OnItemClickListener() {
         @Override
-        public void onItemClick(AdapterView<?> adapterView, View view, int i, long l){
+        public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
             hideSoftKeyboard();
 
             final AutocompletePrediction item = mPlaceAutocompleteAdapter.getItem(i);
@@ -332,7 +332,7 @@ public class MainActivity extends FragmentActivity implements OnMapReadyCallback
                 PlaceBufferResponse places = task.getResult();
                 Place myPlace = places.get(0);
 
-                try{
+                try {
                     mPlace = new PlaceInfo();
                     mPlace.setName(myPlace.getName().toString());
                     mPlace.setAddress(myPlace.getAddress().toString());
@@ -344,8 +344,8 @@ public class MainActivity extends FragmentActivity implements OnMapReadyCallback
 
                     Log.d(TAG, "OnComplete: " + mPlace.toString());
 
-                }catch (NullPointerException e){
-                    Log.e(TAG,"OnResult: " + e.getMessage());
+                } catch (NullPointerException e) {
+                    Log.e(TAG, "OnResult: " + e.getMessage());
                 }
 
                 moveCamera(new LatLng(myPlace.getViewport().getCenter().latitude,
@@ -371,7 +371,7 @@ public class MainActivity extends FragmentActivity implements OnMapReadyCallback
         double lng = mCurrentLocation.getLongitude();
         Log.d(TAG, "updating marker");
         // 4 markers' location relative to current location
-        LatLng[] markerLocations = new LatLng[] {
+        LatLng[] markerLocations = new LatLng[]{
                 new LatLng(lat + 0.003, lng),
                 new LatLng(lat - 0.003, lng),
                 new LatLng(lat, lng + 0.005),
@@ -382,7 +382,7 @@ public class MainActivity extends FragmentActivity implements OnMapReadyCallback
 
         // set at most 4 markers and set icon as photos
         for (int i = 0; i < posts.size() && i < 4; i++) {
-            PostData post = posts.get(i);
+            final PostData post = posts.get(i);
             final Marker mk = mMap.addMarker(new MarkerOptions()
                     .position(markerLocations[i]));
             mk.setTag(i);
@@ -405,9 +405,11 @@ public class MainActivity extends FragmentActivity implements OnMapReadyCallback
             // start activity when marker clicked
             mMap.setOnMarkerClickListener(new GoogleMap.OnMarkerClickListener() {
                 public boolean onMarkerClick(final Marker marker) {
-                    Toast.makeText(MainActivity.this, "Marker "  + marker.getTag() + "is clicked", Toast.LENGTH_SHORT).show();
-//                        Intent intent = new Intent(MainActivity.this, InfoActivity.class);
-//                        startActivity(intent);
+                    Toast.makeText(MainActivity.this, "Marker " + marker.getTag() + "is clicked", Toast.LENGTH_SHORT).show();
+                        Intent intent = new Intent(MainActivity.this, InfoActivity.class);
+                        intent.putExtra("MarkerURL", post.getImageURL());
+                        setResult(RESULT_OK, intent);
+                        startActivity(intent);
                     return true;
                 }
             });
@@ -463,6 +465,16 @@ public class MainActivity extends FragmentActivity implements OnMapReadyCallback
                         Log.i(TAG, "All location settings are satisfied.");
                         initMap();
                         //noinspection MissingPermission
+                        if (ActivityCompat.checkSelfPermission(mContext, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(mContext, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+                            // TODO: Consider calling
+                            //    ActivityCompat#requestPermissions
+                            // here to request the missing permissions, and then overriding
+                            //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
+                            //                                          int[] grantResults)
+                            // to handle the case where the user grants the permission. See the documentation
+                            // for ActivityCompat#requestPermissions for more details.
+                            return;
+                        }
                         mFusedLocationClient.requestLocationUpdates(mLocationRequest,
                                 mLocationCallback, null);
                     }
@@ -495,9 +507,9 @@ public class MainActivity extends FragmentActivity implements OnMapReadyCallback
                 });
     }
 
-    private void initMap(){
+    private void initMap() {
         // Obtain the SupportMapFragment and get notified when the map is ready to be used.
-        Log.d(TAG,"Initializing Map");
+        Log.d(TAG, "Initializing Map");
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
@@ -512,6 +524,16 @@ public class MainActivity extends FragmentActivity implements OnMapReadyCallback
         initSearchBar();
 
         // map properties
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            // TODO: Consider calling
+            //    ActivityCompat#requestPermissions
+            // here to request the missing permissions, and then overriding
+            //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
+            //                                          int[] grantResults)
+            // to handle the case where the user grants the permission. See the documentation
+            // for ActivityCompat#requestPermissions for more details.
+            return;
+        }
         mMap.setMyLocationEnabled(true);
         mMap.getUiSettings().setMyLocationButtonEnabled(false);
     }
