@@ -1,6 +1,7 @@
 package edu.brandeis.cs.bummer.Profile;
 
 import android.content.Context;
+import android.content.Intent;
 import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
@@ -27,6 +28,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import edu.brandeis.cs.bummer.Details.InfoActivity;
 import edu.brandeis.cs.bummer.Post.ImageUploadInfo;
 import edu.brandeis.cs.bummer.R;
 import edu.brandeis.cs.bummer.Utils.BottomNavigationHelper;
@@ -171,7 +173,14 @@ public class ProfileActivity extends AppCompatActivity {
                 gridView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
                     @Override
                     public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                        mOnGridImageSelectedListener.onGridImageSelected(imageUploadInfoList.get(position), ACTIVITY_NUM);
+                        //mOnGridImageSelectedListener.onGridImageSelected(imageUploadInfoList.get(position), ACTIVITY_NUM);
+                        Intent intent = new Intent(ProfileActivity.this, InfoActivity.class);
+                        String[] data = new String[2];
+
+                        data[0] = imageUploadInfoList.get(position).getImageURL();
+                        data[1] = imageUploadInfoList.get(position).getImageName();
+                        intent.putExtra("MarkerURL",data);
+                        startActivity(intent);
                     }
                 });
 
