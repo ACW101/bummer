@@ -1,0 +1,63 @@
+{
+  "project_info": {
+    "project_number": "697869236992",
+    "firebase_url": "https://bummer-ec3a6.firebaseio.com",
+    "project_id": "bummer-ec3a6",
+    "storage_bucket": "bummer-ec3a6.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:697869236992:android:beedce91245143a2",
+        "android_client_info": {
+          "package_name": "edu.brandeis.cs.bummer"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "697869236992-oju4bkn0pb8dnhq1o5pnikbal98ndch7.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "edu.brandeis.cs.bummer",
+            "certificate_hash": "c341ef4077cb94fa3467e886dbb4401b5052eee7"
+          }
+        },
+        {
+          "client_id": "697869236992-hku64edtb7m1l4diijm1l6m6t8cnrush.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "edu.brandeis.cs.bummer",
+            "certificate_hash": "1d2b20508cdd2436053d770ac8ea7990714474ad"
+          }
+        },
+        {
+          "client_id": "697869236992-vsr8uuktj8nu3keg8987atpjokrt8ugd.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDTg9E67mvZ7QVhisEiYqH25de2hw46-58"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 2,
+          "other_platform_oauth_client": [
+            {
+              "client_id": "697869236992-vsr8uuktj8nu3keg8987atpjokrt8ugd.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
