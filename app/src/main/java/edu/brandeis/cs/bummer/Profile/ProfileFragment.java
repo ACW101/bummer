@@ -45,6 +45,8 @@ public class ProfileFragment extends Fragment {
     private TextView mFollowers;
     private TextView mFollowing;
 
+
+
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, Bundle savedInstanceState) {

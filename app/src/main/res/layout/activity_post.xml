@@ -16,7 +16,13 @@
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content">
-
+            <ImageView
+                android:layout_width="120dp"
+                android:layout_height="match_parent"
+                android:background="@drawable/rounded_edittext"
+                android:id="@+id/image"
+                android:src="@drawable/headshot"
+                />
             <EditText
                 android:id="@+id/input_text"
                 android:layout_width="match_parent"
@@ -68,13 +74,17 @@
             android:id="@+id/btn_post_loc"/>
         <!--map-->
         <ImageView
-            android:layout_width="300dp"
-            android:layout_height="300dp"
-            android:layout_gravity="center"
-            android:background="@drawable/rounded_edittext"
-            android:id="@+id/image"
-            android:src="@drawable/headshot"
-            />
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:src="@drawable/map3"
+
+
+            android:layout_marginBottom="13dp"
+            android:layout_above="@+id/linearLayout"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentStart="true"
+            android:id="@+id/imageView3" />
+
     </LinearLayout>
 
     <include layout="@layout/bottom_navi_bar"/>
