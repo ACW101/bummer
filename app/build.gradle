@@ -42,6 +42,8 @@ dependencies {
     compile 'com.google.android.gms:play-services-fitness:11.6.0'
     compile 'com.google.android.gms:play-services-wearable:11.6.0'
 
+    compile 'com.nostra13.universalimageloader:universal-image-loader:1.9.5'
+
     implementation 'com.android.support.constraint:constraint-layout:+'
     // circular image view
     compile 'de.hdodenhof:circleimageview:2.2.0'
