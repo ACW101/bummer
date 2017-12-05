@@ -75,7 +75,6 @@
             android:id="@+id/image"
             android:src="@drawable/headshot"
             />
-
     </LinearLayout>
 
     <include layout="@layout/bottom_navi_bar"/>
