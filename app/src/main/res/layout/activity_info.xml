@@ -23,6 +23,10 @@
             android:layout_centerHorizontal="true"
             android:layout_marginTop="26dp"
             android:background="@drawable/rounded_edittext"
+            android:textSize="22sp"
+            android:textStyle="bold"
+            android:textColor="@color/black"
+            android:text="Guess Guess Guess"
             android:paddingLeft="20dp"
             android:paddingRight="20dp"
             android:paddingTop="20dp" />

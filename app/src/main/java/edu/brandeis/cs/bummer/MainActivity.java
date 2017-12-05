@@ -423,7 +423,10 @@ public class MainActivity extends FragmentActivity implements OnMapReadyCallback
                         Intent intent = new Intent(MainActivity.this, InfoActivity.class);
                         int MarkerNum = (int) marker.getTag();
                         PostData myPost = posts.get(MarkerNum);
-                        intent.putExtra("MarkerURL", myPost.getImageURL());
+                        String[] data = new String[2];
+                        data[0] = myPost.getImageURL();
+                        data[1] = myPost.getImageName();
+                        intent.putExtra("MarkerURL",data);
                         startActivity(intent);
                     return true;
                 }

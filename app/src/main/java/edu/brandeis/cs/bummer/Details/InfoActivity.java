@@ -6,6 +6,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
 import android.widget.ImageView;
+import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
 
@@ -21,6 +22,7 @@ public class InfoActivity extends AppCompatActivity {
     private static final String TAG = "InfoActivity";
     ImageView mFavorite;
     ImageView mComment;
+    TextView mText;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -29,12 +31,18 @@ public class InfoActivity extends AppCompatActivity {
         imageView = (ImageView)findViewById(R.id.image_info);
         mFavorite = (ImageView)findViewById(R.id.love_button);
         mComment = (ImageView)findViewById(R.id.comment_button);
+        mText = (TextView)findViewById(R.id.description);
 
         URL url = null;
+        String[] result = getIntent().getExtras().getStringArray("MarkerURL");
+
         try {
-            url = new URL(getIntent().getExtras().getString("MarkerURL"));
+            assert result != null;
+            url = new URL(result[0]);
+            String message = result[1];
 //                    bmp = BitmapFactory.decodeStream(url.openConnection().getInputStream());
             Glide.with(mContext).asBitmap().load(url).into(imageView);
+            mText.setText(message);
         } catch (MalformedURLException e) {
             e.printStackTrace();
         }
