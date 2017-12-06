@@ -11,10 +11,21 @@
     </RelativeLayout>
     <RelativeLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="130dp"
         android:layout_below="@id/relLayout1"
         android:id="@+id/relLayout2">
+
         <include layout="@layout/layout_center_profilebody" />
+
     </RelativeLayout>
+    <GridView
+        android:id="@+id/gview"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:numColumns="3"
+
+        android:stretchMode="columnWidth"
+        android:layout_below="@+id/relLayout2"
+        ></GridView>
 </RelativeLayout>
 

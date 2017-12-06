@@ -33,7 +33,7 @@
                     android:layout_marginRight="20dp"
                     android:layout_centerVertical="true"
                     android:id="@+id/profileMenu"
-                    android:src="@drawable/ic_menu"/>
+                    android:src="@drawable/ic_logout"/>
 
             </RelativeLayout>
 
