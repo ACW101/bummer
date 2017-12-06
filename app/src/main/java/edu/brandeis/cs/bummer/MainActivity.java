@@ -101,7 +101,7 @@ public class MainActivity extends FragmentActivity implements OnMapReadyCallback
     }
     private static final String TAG = "MainActivity";
     private static final int ACTIVITY_NUM = 0;
-    private static final float DEFAULT_ZOOM = 15f;
+    private static final float DEFAULT_ZOOM = 17f;
     private static final LatLngBounds LAT_LNG_BOUNDS = new LatLngBounds(
             new LatLng(-40, -168), new LatLng(71, 168));
 
@@ -321,6 +321,13 @@ public class MainActivity extends FragmentActivity implements OnMapReadyCallback
                     .title(title);
             mMap.addMarker(options);
         }
+        CameraPosition cameraPosition = new CameraPosition.Builder()
+                .target(latLng)      // Sets the center of the map to Mountain View
+                .zoom(DEFAULT_ZOOM)                   // Sets the zoom
+                .bearing(90)                // Sets the orientation of the camera to east
+                .tilt(30)                   // Sets the tilt of the camera to 30 degrees
+                .build();                   // Creates a CameraPosition from the builder
+        mMap.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
         hideSoftKeyboard();
     }
 
@@ -406,10 +413,10 @@ public class MainActivity extends FragmentActivity implements OnMapReadyCallback
         Log.d(TAG, "updating marker");
         // 4 markers' location relative to current location
         LatLng[] markerLocations = new LatLng[] {
-                new LatLng(lat + 0.003, lng),
-                new LatLng(lat - 0.003, lng),
-                new LatLng(lat, lng + 0.005),
-                new LatLng(lat, lng - 0.005)
+                new LatLng(lat + 0.001, lng),
+                new LatLng(lat - 0.001, lng),
+                new LatLng(lat, lng + 0.002),
+                new LatLng(lat, lng - 0.002)
         };
         // get latest post
         final List<PostData> posts = locationData.getPosts();
