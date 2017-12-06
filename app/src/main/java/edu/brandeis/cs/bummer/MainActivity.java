@@ -4,13 +4,16 @@ import android.Manifest;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentSender;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
+import android.graphics.Camera;
 import android.location.Address;
 import android.location.Geocoder;
 import android.location.Location;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.PersistableBundle;
 import android.provider.Settings;
 import android.support.annotation.NonNull;
 import android.support.design.widget.Snackbar;
@@ -51,12 +54,14 @@ import com.google.android.gms.location.places.Place;
 import com.google.android.gms.location.places.PlaceBufferResponse;
 import com.google.android.gms.location.places.PlaceDetectionClient;
 import com.google.android.gms.location.places.Places;
+import com.google.android.gms.maps.CameraUpdate;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.BitmapDescriptor;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
+import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.LatLngBounds;
 import com.google.android.gms.maps.model.Marker;
@@ -88,6 +93,7 @@ public class MainActivity extends FragmentActivity implements OnMapReadyCallback
         GoogleApiClient.OnConnectionFailedListener{
 
     private static final int REQUEST_PERMISSIONS_REQUEST_CODE = 30;
+    private static final int LOCATION_REQUEST_INTERVAL = 10000;
 
     @Override
     public void onConnectionFailed(@NonNull ConnectionResult connectionResult) {
@@ -98,6 +104,10 @@ public class MainActivity extends FragmentActivity implements OnMapReadyCallback
     private static final float DEFAULT_ZOOM = 15f;
     private static final LatLngBounds LAT_LNG_BOUNDS = new LatLngBounds(
             new LatLng(-40, -168), new LatLng(71, 168));
+
+    // persist state
+    private SharedPreferences mapStatePrefs;
+    private static final String PREFS_NAME ="mapCameraState";
 
     //widgets
     private AutoCompleteTextView mSearchText;
@@ -128,6 +138,7 @@ public class MainActivity extends FragmentActivity implements OnMapReadyCallback
     private LocationCallback mLocationCallback;
     private Location mCurrentLocation;
     private SettingsClient mSettingsClient;
+    private LatLng lastLocation;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -136,7 +147,8 @@ public class MainActivity extends FragmentActivity implements OnMapReadyCallback
 
         // listen for auth change and start signin activity if needed
         mAuth = FirebaseAuth.getInstance();
-       //mAuth.signOut();
+
+        mapStatePrefs = this.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE);
 
         mAuthListener = new FirebaseAuth.AuthStateListener() {
             @Override
@@ -189,6 +201,27 @@ public class MainActivity extends FragmentActivity implements OnMapReadyCallback
             Log.d(TAG, "onResume: ");
             requestPermissions();
         }
+
+        // getting last location from SharePreference
+        lastLocation = new LatLng(mapStatePrefs.getFloat("Lat", (float) 42.3174), mapStatePrefs.getFloat("Lng", (float) -71.0396));
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        if (mCurrentLocation != null) {
+            saveMapState();
+        }
+    }
+
+    /*
+        save map's current location to SharePreference
+     */
+    private void saveMapState() {
+        SharedPreferences.Editor editor = mapStatePrefs.edit();
+        editor.putFloat("Lat", (float) mCurrentLocation.getLatitude());
+        editor.putFloat("Lng", (float) mCurrentLocation.getLongitude());
+        editor.commit();
     }
 
     @Override
@@ -444,7 +477,7 @@ public class MainActivity extends FragmentActivity implements OnMapReadyCallback
      */
     protected void createLocationRequest() {
         mLocationRequest = new LocationRequest();
-        mLocationRequest.setInterval(10000);
+        mLocationRequest.setInterval(LOCATION_REQUEST_INTERVAL);
         mLocationRequest.setFastestInterval(5000);
         mLocationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
     }
@@ -516,6 +549,9 @@ public class MainActivity extends FragmentActivity implements OnMapReadyCallback
         Log.d(TAG, "onMapReady: map is ready");
 
         mMap = googleMap;
+
+        moveCamera(lastLocation, DEFAULT_ZOOM, "First Location");
+
         initSearchBar();
 
         // map properties
@@ -552,9 +588,7 @@ public class MainActivity extends FragmentActivity implements OnMapReadyCallback
                     });
         } else {
             Log.i(TAG, "Requesting permission");
-            // Request permission. It's possible this can be auto answered if device policy
-            // sets the permission in a given state or the user denied the permission
-            // previously and checked "Never ask again".
+            // Request permission.
             ActivityCompat.requestPermissions(MainActivity.this,
                     new String[]{Manifest.permission.ACCESS_FINE_LOCATION},
                     REQUEST_PERMISSIONS_REQUEST_CODE);
@@ -577,16 +611,6 @@ public class MainActivity extends FragmentActivity implements OnMapReadyCallback
                 }
             } else {
                 // Permission denied.
-
-                // Notify the user via a SnackBar that they have rejected a core permission for the
-                // app, which makes the Activity useless. In a real app, core permissions would
-                // typically be best requested during a welcome-screen flow.
-
-                // Additionally, it is important to remember that a permission might have been
-                // rejected without asking the user for permission (device policy or "Never ask
-                // again" prompts). Therefore, a user interface affordance is typically implemented
-                // when permissions are denied. Otherwise, your app could appear unresponsive to
-                // touches or interactions which have required permissions.
                 showSnackbar(R.string.permission_denied_explanation,
                         android.R.string.no, new View.OnClickListener() {
                             @Override
