@@ -36,6 +36,7 @@ import java.util.Map;
 
 import de.hdodenhof.circleimageview.CircleImageView;
 import edu.brandeis.cs.bummer.Details.InfoActivity;
+import edu.brandeis.cs.bummer.Models.PostData;
 import edu.brandeis.cs.bummer.Post.ImageUploadInfo;
 import edu.brandeis.cs.bummer.R;
 import edu.brandeis.cs.bummer.Utils.BottomNavigationHelper;
@@ -154,7 +155,6 @@ public class ProfileActivity extends AppCompatActivity {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
                 for ( DataSnapshot singleSnapshot :  dataSnapshot.getChildren()){
-
                     ImageUploadInfo imageUploadInfo = new ImageUploadInfo();
                     Bitmap tmpbitmap;
                     Map<String, Object> objectMap = (HashMap<String, Object>) singleSnapshot.getValue();
@@ -162,12 +162,8 @@ public class ProfileActivity extends AppCompatActivity {
                     try {
                         imageUploadInfo.imageName = objectMap.get("imageName").toString();
                         imageUploadInfo.imageURL = objectMap.get("imageURL").toString();
-
                         imageUploadInfoList.add(imageUploadInfo);
                         // Getting selected image into Bitmap.
-
-
-
 
                     }catch(NullPointerException e){
                         Log.e(TAG, "onDataChange: NullPointerException: " + e.getMessage() );
@@ -175,11 +171,10 @@ public class ProfileActivity extends AppCompatActivity {
 
                 }
 
-
                 Log.e(TAG, "onDataChange: "+ "imageUploadList.len = " + imageUploadInfoList.size() );
                 ArrayList<String> imgUrls = new ArrayList<String>();
                 for(int i = 0; i < imageUploadInfoList.size(); i++){
-                    imgUrls.add(imageUploadInfoList.get(i).getImageURL());
+                    imgUrls.add(PostData.toThumbURL(imageUploadInfoList.get(i).getImageURL()));
                 }
                 GridViewHelper adapter = new GridViewHelper(mContext,R.layout.layout_circle,
                         "", imgUrls);
@@ -200,7 +195,6 @@ public class ProfileActivity extends AppCompatActivity {
                         startActivity(intent);
                     }
                 });
-
             }
 
             @Override

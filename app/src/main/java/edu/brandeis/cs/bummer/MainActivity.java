@@ -426,7 +426,7 @@ public class MainActivity extends FragmentActivity implements OnMapReadyCallback
                 String thumbURL = PostData.toThumbURL(post.getImageURL());
                 Log.d(TAG, "updateMarker: translate to thumbURL");
                 URL url = new URL(thumbURL);
-                Glide.with(mContext).asBitmap().load(url).into(new SimpleTarget<Bitmap>() {
+                Glide.with(getBaseContext()).asBitmap().load(url).into(new SimpleTarget<Bitmap>() {
                     @Override
                     public void onResourceReady(Bitmap resource, Transition<? super Bitmap> transition) {
                         BitmapDescriptor icon = BitmapDescriptorFactory.fromBitmap(resource);
@@ -556,7 +556,7 @@ public class MainActivity extends FragmentActivity implements OnMapReadyCallback
 
         // map properties
         mMap.setMyLocationEnabled(true);
-        mMap.getUiSettings().setMyLocationButtonEnabled(false);
+        mMap.getUiSettings().setMyLocationButtonEnabled(true);
     }
 
     private boolean checkPermissions() {
