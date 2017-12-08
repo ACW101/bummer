@@ -90,17 +90,6 @@ public class ProfileActivity extends AppCompatActivity {
         getImages();
     }
 
-    /**
-     * private void init() {
-     * Log.d(TAG, "init: inflating fragment");
-     * ProfileFragment profileFragment = new ProfileFragment();
-     * FragmentManager fm = this.getFragmentManager();
-     * FragmentTransaction ft = fm.beginTransaction();
-     * ft.add(R.id.container_profile, profileFragment);
-     * ft.commit();
-     * <p>
-     * }
-     **/
 
     private void setupToolbar() {
         Toolbar toolbar = (Toolbar) findViewById(R.id.profileToolBar);

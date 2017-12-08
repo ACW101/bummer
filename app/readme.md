@@ -1,0 +1,1 @@
+Attention: This project requires at least v.11.0.6 Google Play Compatible phone/emulator to run properly.

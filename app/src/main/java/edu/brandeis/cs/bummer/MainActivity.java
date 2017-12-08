@@ -186,8 +186,6 @@ public class MainActivity extends FragmentActivity implements OnMapReadyCallback
 
         // reset UI on bottom nav bar
         setupBottomNavigationView();
-
-     //mAuth.signOut();
     }
 
     @Override
@@ -229,13 +227,6 @@ public class MainActivity extends FragmentActivity implements OnMapReadyCallback
         mAuth.removeAuthStateListener(mAuthListener);
         super.onDestroy();
     }
-
-//    private boolean isNetworkConnected() {
-//        ConnectivityManager cm = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
-//
-//        return cm.getActiveNetworkInfo() != null;
-//    }
-
 
     private void initSearchBar(){
         Log.d(TAG, "initSearchBar: initializing");

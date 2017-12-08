@@ -192,29 +192,5 @@ public class SignupActivity extends BaseActivity implements View.OnClickListener
         mFirebaseDatabase = FirebaseDatabase.getInstance();
         mRef = mFirebaseDatabase.getReference();
 
-//        mAuthListener = new FirebaseAuth.AuthStateListener() {
-//            @Override
-//            public void onAuthStateChanged(@NonNull FirebaseAuth firebaseAuth) {
-//                FirebaseUser user = firebaseAuth.getCurrentUser();
-//
-//                if (user != null) {
-//                    Log.d(TAG, "onAuthStateChanged: user is signed in " + user.getUid());
-//                    mRef.addListenerForSingleValueEvent(new ValueEventListener() {
-//                        @Override
-//                        public void onDataChange(DataSnapshot dataSnapshot) {
-//                            Log.d(TAG, "onDataChange: dataChange");
-//                            mFirebaseHelper.addUser(email, name);
-//                        }
-//
-//                        @Override
-//                        public void onCancelled(DatabaseError databaseError) {
-//                            Log.d(TAG, "onDataChange: cancelled");
-//                        }
-//                    });
-//                } else {
-//                    Log.d(TAG, "onAuthStateChanged: user is signed out");
-//                }
-//            }
-//        };
     }
 }
